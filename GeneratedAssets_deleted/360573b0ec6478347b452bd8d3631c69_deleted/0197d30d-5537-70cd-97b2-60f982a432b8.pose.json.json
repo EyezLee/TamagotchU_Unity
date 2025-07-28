@@ -1,0 +1,10 @@
+{
+    "asset": "360573b0ec6478347b452bd8d3631c69",
+    "fileName": "0197d30d-5537-70cd-97b2-60f982a432b8.pose.json",
+    "prompt": "runing dinosaur",
+    "negativePrompt": "",
+    "model": "a9c27ca4-3ec9-43e8-96cd-ee891aba64c5",
+    "modelName": "Text to Motion",
+    "customSeed": 1420159472,
+    "w3CTraceId": "2deddd141cbf7016ab7d75961e7e3970"
+}

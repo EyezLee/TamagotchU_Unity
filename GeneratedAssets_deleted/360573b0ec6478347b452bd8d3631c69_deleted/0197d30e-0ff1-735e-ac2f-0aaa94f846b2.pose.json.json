@@ -1,0 +1,10 @@
+{
+    "asset": "360573b0ec6478347b452bd8d3631c69",
+    "fileName": "0197d30e-0ff1-735e-ac2f-0aaa94f846b2.pose.json",
+    "prompt": "rabbit eating grass",
+    "negativePrompt": "",
+    "model": "a9c27ca4-3ec9-43e8-96cd-ee891aba64c5",
+    "modelName": "Text to Motion",
+    "customSeed": 367373742,
+    "w3CTraceId": "98cbc7e8b4f896e2a69d5da2d56c0002"
+}

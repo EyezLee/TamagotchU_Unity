@@ -1,0 +1,11 @@
+{
+    "asset": "34fb171fcce7b78449de185629050f3c",
+    "fileName": "0198339e-9c90-7120-969e-f9c3086cd6d8_Preview.png",
+    "prompt": " write a shader of transparent, moving wavy lines formed by soft round emmisive dots. ",
+    "negativePrompt": "textures",
+    "model": "575ecf67-4425-4939-97b9-5e138b8ee234",
+    "modelName": "Unity Texture2D",
+    "customSeed": 1182218372,
+    "w3CTraceId": "7f34ebd4149d548ff325e87b2e5b76d6",
+    "refinementMode": "Generation"
+}

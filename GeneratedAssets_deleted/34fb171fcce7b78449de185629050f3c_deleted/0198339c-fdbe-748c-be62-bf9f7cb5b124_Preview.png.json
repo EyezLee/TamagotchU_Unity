@@ -1,0 +1,11 @@
+{
+    "asset": "34fb171fcce7b78449de185629050f3c",
+    "fileName": "0198339c-fdbe-748c-be62-bf9f7cb5b124_Preview.png",
+    "prompt": "make a transparent, with moving wavy lines formed by soft round emmisive dots",
+    "negativePrompt": "",
+    "model": "575ecf67-4425-4939-97b9-5e138b8ee234",
+    "modelName": "Unity Texture2D",
+    "customSeed": 662367463,
+    "w3CTraceId": "72568c70021078e95bb8ef0ef9d2ada1",
+    "refinementMode": "Generation"
+}

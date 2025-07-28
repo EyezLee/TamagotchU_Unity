@@ -24,7 +24,7 @@ public class BlendShapeToVFXBinder : MonoBehaviour
     public string vfxPropertyName = "ThornScale";
 
     [Tooltip("The duration of the blend shape animation in seconds.")]
-    public float debugShapekey = 1.0f;
+    public float debugShapekeyDuration = 1.0f;
 
     private Coroutine blendShapeCoroutine;
 
@@ -56,7 +56,7 @@ public class BlendShapeToVFXBinder : MonoBehaviour
             {
                 StopCoroutine(blendShapeCoroutine);
             }
-            blendShapeCoroutine = StartCoroutine(AnimateBlendShape(0, 100, debugShapekey));
+            blendShapeCoroutine = StartCoroutine(AnimateBlendShape(0, 100, debugShapekeyDuration));
         }
     }
 

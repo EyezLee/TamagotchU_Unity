@@ -113,8 +113,8 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _FresnelIntensity: 0.69
-    - _FresnelPower: 1.11
+    - _FresnelIntensity: 0.57
+    - _FresnelPower: 0.75
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -131,10 +131,10 @@ Material:
     - _RefractionStrength: 2.79
     - _RidgeIntensity: 2
     - _Scale: 6.3
-    - _Shininess: 1.57
-    - _Smoothness: 0.299
+    - _Shininess: 2.17
+    - _Smoothness: 0.463
     - _SmoothnessTextureChannel: 0
-    - _Specular: 0.12
+    - _Specular: 0.29
     - _SpecularHighlights: 1
     - _Speed: 6.49
     - _SrcBlend: 1
@@ -152,10 +152,10 @@ Material:
     - _BaseColor: {r: 1, g: 0.32756364, b: 0, a: 1}
     - _Color: {r: 1, g: 0.94567186, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FresnelColor: {r: 0.8805031, g: 0.32949638, b: 0.6334067, a: 1}
-    - _GrooveColor: {r: 0.35220122, g: 0.16724017, b: 0.1795709, a: 1}
-    - _LightDir: {r: 0.06, g: -0.08, b: 0.46, a: 0}
-    - _MainColor: {r: 0.42767292, g: 0.19718976, b: 0.10355598, a: 1}
+    - _FresnelColor: {r: 0.8805031, g: 0.29073206, b: 0.6169885, a: 1}
+    - _GrooveColor: {r: 0.5345911, g: 0.25582007, b: 0.14961822, a: 1}
+    - _LightDir: {r: -0.28, g: -0.08, b: 0.46, a: 0}
+    - _MainColor: {r: 0.44654083, g: 0.22195074, b: 0.13059206, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

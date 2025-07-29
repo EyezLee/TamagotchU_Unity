@@ -30,6 +30,6 @@ public class ObjectMotionFeed : MonoBehaviour
         lastCenter = currentCenter;
 
         targetMaterial.SetVector("_SurfaceNoiseScroll", velocity);
-        Debug.Log(velocity);
+        //Debug.Log(velocity);
     }
 }

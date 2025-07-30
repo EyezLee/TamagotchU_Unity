@@ -5,12 +5,25 @@ using System.Text;
 using System.Threading;
 using System.Collections.Concurrent;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 [Serializable]
 public class MetaData
 {
     public string message;
     public float value;
+}
+class TimedEntry
+{
+    public string message;
+    public float value;
+    public float timestamp;  // Time.time value when added
+
+    public override string ToString()
+    {
+        return $"[{timestamp:F2}] {message}: {value}";
+    }
 }
 
 public class SocketReceiver : MonoBehaviour
@@ -27,6 +40,9 @@ public class SocketReceiver : MonoBehaviour
 
     // Thread-safe queue to communicate between thread and Update()
     private ConcurrentQueue<MetaData> _dataQueue = new ConcurrentQueue<MetaData>();
+
+    // Time-limited timed entries list
+    private List<TimedEntry> timedEntries = new List<TimedEntry>();
 
     void Start()
     {
@@ -48,13 +64,54 @@ public class SocketReceiver : MonoBehaviour
 
     void Update()
     {
-        // Dequeue any received data and update fields
+        // 1. Dequeue any received data and update fields
         while (_dataQueue.TryDequeue(out MetaData meta))
         {
             receivedString = meta.message;
             receivedFloat = meta.value;
-            Debug.Log($"Received message: {receivedString}, value: {receivedFloat}");
+            //Debug.Log($"Received message: {receivedString}, value: {receivedFloat}");
+
+            // add received data
+            timedEntries.Add(new TimedEntry
+            {
+                message = meta.message,
+                value = meta.value,
+                timestamp = Time.time
+            });
         }
+
+        // 2. Remove entries older than 3 seconds
+        float now = Time.time;
+        timedEntries.RemoveAll(entry => (now - entry.timestamp) > 3.0f);
+
+        // 3. Optional: keep list sorted by timestamp ascending (oldest first)
+        // This makes weighted sum easier — oldest at index 0, newest at last index
+        timedEntries.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Log("Entries:\n" + string.Join("\n", timedEntries));
+        }
+    }
+
+    public float GetWeightedSum()
+    {
+        if (timedEntries.Count == 0)
+            return 0f;
+
+        float sum = 0f;
+        float totalWeight = 0f;
+        int count = timedEntries.Count;
+
+        // Weights: oldest = 1, newest = count (simple linear scale)
+        for (int i = 0; i < count; i++)
+        {
+            int weight = i + 1;
+            sum += timedEntries[i].value * weight;
+            totalWeight += weight;
+        }
+
+        return sum / totalWeight;  // normalize weighted average
     }
 
     private void ListenForData()

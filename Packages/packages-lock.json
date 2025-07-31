@@ -341,6 +341,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "ga.fuquna.vatbaker": {
+      "version": "1.0.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.com"
+    },
     "jp.keijiro.noiseshader": {
       "version": "3.0.0",
       "depth": 0,

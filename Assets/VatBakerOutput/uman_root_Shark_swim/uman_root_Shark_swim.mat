@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: uman_root_Shark_swim
-  m_Shader: {fileID: 4800000, guid: 55d8a79bc28da994bac2886d522d44c2, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: fe71c0dda18807344ba47508d2f1fe50, type: 3}
   m_Parent: {fileID: 2100000, guid: 32df1e1847538244cbf46c4dd38fbabc, type: 2}
   m_ModifiedSerializedProperties: 4
   m_ValidKeywords: []
@@ -17,8 +17,10 @@ Material:
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -29,8 +31,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _VatAnimFps: 5
-    - _VatAnimLength: 3.3333335
+    - _VatAnimFps: 15.02
+    - _VatAnimLength: 6.8
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &2725546983695598125
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10

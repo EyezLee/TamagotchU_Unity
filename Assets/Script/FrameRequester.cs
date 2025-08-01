@@ -1,22 +1,67 @@
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class FrameRequester : MonoBehaviour
 {
     public string pythonServerIp = "PYTHON_PC_IP"; // replace with real IP
     public int pythonPort = 6006;
-    [SerializeField] Renderer targetRenderer;
+    [SerializeField] Renderer debugRenderer;
+    [SerializeField] VisualEffect vfx;
+    [SerializeField] Vector4 faceAtlasConfig; // (numX, numY, resX, resY)
+
+    int faceId = 0;
+    Texture2D atlasTexture;
+
+    private void Start()
+    {
+        CreateAtlas();
+    }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.F)) // Change 'F' to your desired key
         {
-            SendFrameRequest();
+            Texture2D receivedTexture = SendFrameRequest();
+
+            if(receivedTexture)
+            {
+                int cellIndex = 0;
+                UpdateAtlas(receivedTexture, faceId, out cellIndex);
+                SendVFXEvent(cellIndex);
+
+                faceId++;
+
+                Destroy(receivedTexture);
+            }
+            else
+            {
+                Debug.Log("failed to receive facetexture");
+            }
         }
     }
 
-    void SendFrameRequest()
+    void CreateAtlas()
+    {
+        int atlasWidth = (int)faceAtlasConfig.x * (int)faceAtlasConfig.z;
+        int atlasHeight = (int)faceAtlasConfig.y * (int)faceAtlasConfig.w;
+
+        atlasTexture = new Texture2D(atlasWidth, atlasHeight, TextureFormat.RGBA32, false);
+        // Initialize with transparent pixels
+        Color32[] fillColorArray = atlasTexture.GetPixels32();
+
+        for (int i = 0; i < fillColorArray.Length; i++)
+            fillColorArray[i] = new Color32(0, 0, 0, 0);
+
+        atlasTexture.SetPixels32(fillColorArray);
+        atlasTexture.Apply();
+
+        // debug: assign to material or shader that will use the atlas
+        debugRenderer.material.mainTexture = atlasTexture;
+    }
+
+    Texture2D SendFrameRequest()
     {
         try
         {
@@ -29,8 +74,6 @@ public class FrameRequester : MonoBehaviour
                 stream.Write(requestBytes, 0, requestBytes.Length);
 
                 // Read frame data back (e.g., as PNG bytes)
-                // --- here you need to agree the receive format ---
-                // For demo: Read first 4 bytes (length), then read that many bytes
 
                 byte[] lenBuf = new byte[4];
                 stream.Read(lenBuf, 0, 4);
@@ -47,26 +90,93 @@ public class FrameRequester : MonoBehaviour
                 if (tex.LoadImage(imgBytes))
                 {
                     Debug.Log("Received frame from Python!");
-
-                    // Assign the texture to the material on the target renderer
-                    if (targetRenderer != null)
-                    {
-                        targetRenderer.material.mainTexture = tex;
-                    }
-                    else
-                    {
-                        Debug.LogWarning("targetRenderer is null. Assign a Renderer that has the material to display the texture.");
-                    }
+                    tex.Apply();
+                    return tex;
                 }
                 else
                 {
                     Debug.LogError("Failed to load image bytes into texture.");
+                    return null;
                 }
             }
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"FrameRequest error: {ex}");
+            return null;
         }
     }
+
+    // Updates the atlas texture by copying newTexture pixels into atlas cell at 'index'
+    void UpdateAtlas(Texture2D newTexture, int index, out int cellIndex)
+    {
+        int totalCells = (int)(faceAtlasConfig.y * faceAtlasConfig.x);
+        cellIndex = index % totalCells;  // wrap index if needed
+
+        int xCell = cellIndex % (int)faceAtlasConfig.x;
+        int yCell = cellIndex / (int)faceAtlasConfig.x;
+
+        int xPos = xCell * (int)faceAtlasConfig.z;
+        int yPos = yCell * (int)faceAtlasConfig.w;
+
+        // resize and Safety size check
+        Texture2D resizedTex;
+        if (newTexture.width != faceAtlasConfig.z || newTexture.height != faceAtlasConfig.w)
+        {
+            //Debug.LogWarning("New texture size does not match atlas cell size.");
+            // resize
+            resizedTex = ResizeTexture(newTexture, (int)faceAtlasConfig.z, (int)faceAtlasConfig.w);
+        }
+        else
+        {
+            resizedTex = newTexture;
+        }
+
+        // Copy pixels from newTexture into atlas at proper location
+        Color[] pixels = resizedTex.GetPixels();
+        atlasTexture.SetPixels(xPos, yPos, (int)faceAtlasConfig.z, (int)faceAtlasConfig.w, pixels);
+        atlasTexture.Apply();
+
+        index = cellIndex;
+
+        Debug.Log($"Updated atlas cell {cellIndex} at position ({xPos},{yPos})");
+    }
+
+    // Helper to resize a Texture2D to target width and height using GPU
+    Texture2D ResizeTexture(Texture2D source, int targetWidth, int targetHeight)
+    {
+        RenderTexture rt = RenderTexture.GetTemporary(targetWidth, targetHeight, 0, RenderTextureFormat.ARGB32);
+        RenderTexture.active = rt;
+
+        // Blit the source texture onto the RenderTexture (scales it)
+        Graphics.Blit(source, rt);
+
+        // Create a new Texture2D with scaled dimensions
+        Texture2D result = new Texture2D(targetWidth, targetHeight, TextureFormat.RGBA32, false);
+
+        // Read the RenderTexture pixels into the new texture
+        result.ReadPixels(new Rect(0, 0, targetWidth, targetHeight), 0, 0);
+        result.Apply();
+
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(rt);
+
+        return result;
+    }
+
+    // Sends VFX event to notify particle system of the new atlas cell to use and trigger spawning
+    void SendVFXEvent(int atlasCellIndex)
+    {
+        if (vfx != null)
+        {
+            vfx.SetInt("AtlasCellIndex", atlasCellIndex);
+            vfx.SendEvent("Born");
+            Debug.Log($"Sent VFX event for AtlasCellIndex {atlasCellIndex}");
+        }
+        else
+        {
+            Debug.LogWarning("VisualEffect component is null. Cannot send VFX event.");
+        }
+    }
+
 }

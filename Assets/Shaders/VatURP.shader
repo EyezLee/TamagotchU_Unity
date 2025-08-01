@@ -46,7 +46,7 @@ Shader "Custom/VatURP"
 
             fixed4 frag (v2f_img i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex, i.uv)*2;
                 return col;
             }
             ENDCG

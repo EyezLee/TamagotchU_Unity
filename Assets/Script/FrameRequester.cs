@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
@@ -13,6 +14,8 @@ public class FrameRequester : MonoBehaviour
 
     int faceId = 0;
     Texture2D atlasTexture;
+    int cellX = 0;
+    int cellY = 0;
 
     private void Start()
     {
@@ -115,6 +118,8 @@ public class FrameRequester : MonoBehaviour
 
         int xCell = cellIndex % (int)faceAtlasConfig.x;
         int yCell = cellIndex / (int)faceAtlasConfig.x;
+        cellX = xCell;
+        cellY = yCell;
 
         int xPos = xCell * (int)faceAtlasConfig.z;
         int yPos = yCell * (int)faceAtlasConfig.w;
@@ -169,7 +174,11 @@ public class FrameRequester : MonoBehaviour
     {
         if (vfx != null)
         {
-            vfx.SetInt("AtlasCellIndex", atlasCellIndex);
+            vfx.SetInt("CellRow", (int)faceAtlasConfig.x);
+            vfx.SetInt("CellColume", (int)faceAtlasConfig.y);
+            vfx.SetInt("CellX", cellX);
+            vfx.SetInt("CellY", cellY);
+            vfx.SetTexture("FaceAtlas", atlasTexture);
             vfx.SendEvent("Born");
             Debug.Log($"Sent VFX event for AtlasCellIndex {atlasCellIndex}");
         }

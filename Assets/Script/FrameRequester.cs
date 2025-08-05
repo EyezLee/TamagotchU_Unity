@@ -77,7 +77,6 @@ public class FrameRequester : MonoBehaviour
                 stream.Write(requestBytes, 0, requestBytes.Length);
 
                 // Read frame data back (e.g., as PNG bytes)
-
                 byte[] lenBuf = new byte[4];
                 stream.Read(lenBuf, 0, 4);
                 if (System.BitConverter.IsLittleEndian)

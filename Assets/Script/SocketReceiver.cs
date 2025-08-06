@@ -6,6 +6,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 [Serializable]
@@ -14,7 +15,7 @@ public class MetaData
     public string message;
     public float value;
 }
-class TimedEntry
+public class TimedEntry
 {
     public string message;
     public float value;
@@ -42,7 +43,11 @@ public class SocketReceiver : MonoBehaviour
     private ConcurrentQueue<MetaData> _dataQueue = new ConcurrentQueue<MetaData>();
 
     // Time-limited timed entries list
-    private List<TimedEntry> timedEntries = new List<TimedEntry>();
+    private List<TimedEntry> playerEmoEntries = new List<TimedEntry>();
+    public ReadOnlyCollection<TimedEntry> PlayerEmoEntries
+    {
+        get { return playerEmoEntries.AsReadOnly(); }
+    }
 
     void Start()
     {
@@ -72,7 +77,7 @@ public class SocketReceiver : MonoBehaviour
             //Debug.Log($"Received message: {receivedString}, value: {receivedFloat}");
 
             // add received data
-            timedEntries.Add(new TimedEntry
+            playerEmoEntries.Add(new TimedEntry
             {
                 message = meta.message,
                 value = meta.value,
@@ -82,32 +87,32 @@ public class SocketReceiver : MonoBehaviour
 
         // 2. Remove entries older than 3 seconds
         float now = Time.time;
-        timedEntries.RemoveAll(entry => (now - entry.timestamp) > 3.0f);
+        playerEmoEntries.RemoveAll(entry => (now - entry.timestamp) > 3.0f);
 
         // 3. Optional: keep list sorted by timestamp ascending (oldest first)
         // This makes weighted sum easier — oldest at index 0, newest at last index
-        timedEntries.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
+        playerEmoEntries.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
 
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Entries:\n" + string.Join("\n", timedEntries));
+            Debug.Log("Entries:\n" + string.Join("\n", playerEmoEntries));
         }
     }
 
     public float GetWeightedSum()
     {
-        if (timedEntries.Count == 0)
+        if (playerEmoEntries.Count == 0)
             return 0f;
 
         float sum = 0f;
         float totalWeight = 0f;
-        int count = timedEntries.Count;
+        int count = playerEmoEntries.Count;
 
         // Weights: oldest = 1, newest = count (simple linear scale)
         for (int i = 0; i < count; i++)
         {
             int weight = i + 1;
-            sum += timedEntries[i].value * weight;
+            sum += playerEmoEntries[i].value * weight;
             totalWeight += weight;
         }
 

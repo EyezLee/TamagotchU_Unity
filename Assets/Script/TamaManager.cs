@@ -28,7 +28,7 @@ public class TamaManager : MonoBehaviour
         int playerEmoCnt = socketReceiver.PlayerEmoEntries.Count;
 
         float happyWeightedSum = 0, negWeightedSum = 0;
-        int totalPosWeight = 0, totalNegWeight = 0;
+        int totalPosWeight = 1, totalNegWeight = 1;
         List<string> emoTagList = new List<string>();
 
         // Weights: oldest = 1, newest = count (simple linear scale)
@@ -58,7 +58,7 @@ public class TamaManager : MonoBehaviour
         tamaEmo.lovey = happyWeightedSum;
         tamaEmo.annoyned = negWeightedSum;
         tamaEmo.alarming = emoTagList.Count / 7.0f; // 7 types of emotion in total
-        tamaEmo.hyped = Mathf.Clamp01(socketReceiver.PlayerEmoEntries.Count / 30.0f);
+        tamaEmo.hyped = Mathf.Clamp01(playerEmoCnt / 30.0f);
         tamaEmo.calm = 1.0f - tamaEmo.hyped;
     }
 

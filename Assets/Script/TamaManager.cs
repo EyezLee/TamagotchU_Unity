@@ -29,7 +29,11 @@ public class TamaManager : MonoBehaviour
 {
     [SerializeField] SocketReceiver socketReceiver;
     [SerializeField] FrameRequester frameRequester;
-    [SerializeField][Range(0, 1)] float testSlider;
+    [Header("Emotion Emulator")]
+    [SerializeField][Range(0, 1)] float calmDebug;
+    [SerializeField][Range(0, 1)] float posDebug;
+    [SerializeField][Range(0, 1)] float negDebug;
+    [SerializeField][Range(0, 1)] float alarmingDebug;
 
     TamaEmo tamaEmo;
     private void Update()
@@ -38,10 +42,10 @@ public class TamaManager : MonoBehaviour
 
         TransformData bounceTrans = BounceMotion(transform);
         TransformData SpinTrans = SpinMotion(transform, sphereCenter);
-        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, testSlider);
-        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, testSlider);
+        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, calmDebug);
+        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, calmDebug);
 
-        Debug.Log(DebugEmo());
+        //Debug.Log(DebugEmo());
     }
 
     void ProcessTamaEmo()
@@ -136,7 +140,7 @@ public class TamaManager : MonoBehaviour
         // Create a quaternion representing the rotation around the axis by the angle
         Quaternion rotation = Quaternion.AngleAxis(angle, axis);
         // Rotate the offset
-        Vector3 rotatedOffset = rotation ;
+        Vector3 rotatedOffset = rotation * offset;
         Vector3 newPosition = center + rotatedOffset;
         TransformData t = new TransformData(trans.position, trans.forward);
         t.position = newPosition;

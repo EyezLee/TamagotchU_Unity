@@ -164,7 +164,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 0.42451942, g: 1, b: 0, a: 1}
-    - _DepthColor: {r: 0, g: 0, b: 0, a: 1}
+    - _DepthColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _RippleScale: {r: 0.45, g: 0.35, b: 0.17, a: 0.4}

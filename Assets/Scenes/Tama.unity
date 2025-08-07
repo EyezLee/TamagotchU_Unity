@@ -636,7 +636,7 @@ Transform:
   m_GameObject: {fileID: 476539333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.17, y: 0.12, z: 0}
+  m_LocalPosition: {x: 0.17, y: 0.12, z: -0.183}
   m_LocalScale: {x: 4.32, y: 4.32, z: 4.32}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -806,6 +806,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TamaManager
   socketReceiver: {fileID: 677559010}
   frameRequester: {fileID: 677559011}
+  testSlider: 0
+  sphereCenter: {x: 0, y: 0, z: 0}
+  sphereRadius: 5
+  velocity: {x: 1, y: 2, z: 1.5}
+  damping: 0.98
+  accelerationStrength: 0
+  spinAxis: {x: 0, y: 1, z: 0}
+  spinSpeed: 90
 --- !u!4 &696171091 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1291054102719760140, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
@@ -1837,7 +1845,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -2725,6 +2733,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 919132147682360159}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 919132147682360161}
     - targetCorrespondingSourceObject: {fileID: 9078151466436353510, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1549751842}
@@ -3604,7 +3615,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.RigBuilder
   m_RigLayers:
   - m_Rig: {fileID: 1508341859}
-    m_Active: 0
+    m_Active: 1
   - m_Rig: {fileID: 811056878}
     m_Active: 1
   m_Effectors: []
@@ -3754,7 +3765,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132147682360153}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 796f3be22490c154190f78aa8a6e8ba0, type: 3}
   m_Name: 
@@ -3768,7 +3779,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132147682360153}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 55aa0357ba6487c49b0f649fb6307b35, type: 3}
   m_Name: 
@@ -3776,6 +3787,28 @@ MonoBehaviour:
   _material: {fileID: 2100000, guid: 76a8bfddb6e56de4faf92cde9ed8ec56, type: 2}
   _duration: 150
   _layer: 3
+--- !u!114 &919132147682360161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132147682360153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cac520939724d04e9945196050c728a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TamaManager
+  socketReceiver: {fileID: 677559010}
+  frameRequester: {fileID: 677559011}
+  testSlider: 0
+  sphereCenter: {x: 0, y: 0, z: 0}
+  sphereRadius: 3
+  velocity: {x: 1, y: 2, z: 1.5}
+  damping: 0.98
+  accelerationStrength: 0.2
+  spinAxis: {x: 0, y: 0, z: 1}
+  spinSpeed: 180
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

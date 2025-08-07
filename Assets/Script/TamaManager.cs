@@ -29,8 +29,9 @@ public class TamaManager : MonoBehaviour
 {
     [SerializeField] SocketReceiver socketReceiver;
     [SerializeField] FrameRequester frameRequester;
+    [SerializeField] GameObject bubble;
     [Header("Emotion Emulator")]
-    [SerializeField][Range(0, 1)] float calmDebug;
+    [SerializeField][Range(0, 1)] float hypeDebug;
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
@@ -42,9 +43,9 @@ public class TamaManager : MonoBehaviour
 
         TransformData bounceTrans = BounceMotion(transform);
         TransformData SpinTrans = SpinMotion(transform, sphereCenter);
-        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, calmDebug);
-        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, calmDebug);
-
+        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, hypeDebug);
+        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, hypeDebug);
+        if(bubble) bubble.transform.localScale = new Vector3(1-hypeDebug, 1-hypeDebug, 1 - hypeDebug)*1.5f;
         //Debug.Log(DebugEmo());
     }
 

@@ -21,8 +21,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Eye
-  m_Shader: {fileID: 108, guid: 0000000000000000f000000000000000, type: 0}
-  m_Parent: {fileID: 2100000, guid: 0a9637fa6825d9e448f284d9b17918b5, type: 2}
+  m_Shader: {fileID: 15301, guid: 0000000000000000f000000000000000, type: 0}
+  m_Parent: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords:

@@ -21,6 +21,7 @@ Shader "Custom/BrainSurfaceSkybox"
         _WaveAmplitude ("Wave Amplitude", Float) = 0.15
 
         _RidgeIntensity ("Ridge Intensity", Float) = 2.0
+        _ReflectionIntensity("Reflection Intensity", Range(0, 1)) = 0.0
     }
 
     SubShader
@@ -32,14 +33,15 @@ Shader "Custom/BrainSurfaceSkybox"
 
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM 
             #pragma vertex vert
             #pragma fragment frag
-            #include "UnityCG.cginc"
 
-            fixed4 _MainColor;
-            fixed4 _GrooveColor;
-            fixed4 _FresnelColor;
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            float4 _MainColor;
+            float4 _GrooveColor;
+            float4 _FresnelColor;
             float _Scale;
             float _Detail;
             float _WarpStrength;
@@ -56,15 +58,20 @@ Shader "Custom/BrainSurfaceSkybox"
             float _WaveAmplitude;
             float _RidgeIntensity;
 
+            float _ReflectionIntensity;
+
             struct appdata
             {
                 float3 vertex : POSITION;
+                float2 uv : TEXCOORD2;   
             };
 
             struct v2f
             {
                 float3 direction : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float3 worldPos : TEXCOORD1;
+                float2 uv : TEXCOORD2;
             };
 
             // Noise functions and FBM as in your original shader
@@ -125,14 +132,16 @@ Shader "Custom/BrainSurfaceSkybox"
                 v2f o;
                 // Normalize vertex position to get direction vector from center
                 o.direction = normalize(v.vertex);
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = TransformObjectToHClip(v.vertex);
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.uv = v.uv;
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // Use the skybox direction vector projected to 2D for pattern generation
-                float2 uv = i.direction.xy * _Scale;
+                float2 uv = i.uv;
 
                 // Animate the pattern with time-based wave motion
                 float t = _Time.y * _WaveSpeed;
@@ -161,12 +170,22 @@ Shader "Custom/BrainSurfaceSkybox"
 
                 float fresnel = pow(1.0 - saturate(dot(viewDir, normal)), _FresnelPower) * _FresnelIntensity;
 
-                fixed3 baseCol = lerp(_MainColor.rgb, _GrooveColor.rgb, groove);
-                fixed3 finalCol = baseCol * diff + spec + fresnel * _FresnelColor.rgb;
+                float3 baseCol = lerp(_MainColor.rgb, _GrooveColor.rgb, groove);
+                baseCol = baseCol * diff + spec + fresnel * _FresnelColor.rgb;
 
-                return fixed4(saturate(finalCol), 1);
+                // reflection
+                //float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);  // view direction
+                float3 positionWS = i.worldPos;
+                float3 reflectVector = normalize(i.direction);                   // reflection direction
+
+                float3 probes = CalculateIrradianceFromReflectionProbes(reflectVector, positionWS, 0, i.uv);
+
+                float3 finalCol = lerp(baseCol, probes.rgb, _ReflectionIntensity);
+
+
+                return float4(finalCol, 1);
             }
-            ENDCG
+            ENDHLSL 
         }
     }
     Fallback Off

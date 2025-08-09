@@ -64,7 +64,10 @@ public class TamaManager : MonoBehaviour
         }
 
         // happy
+        if(happyVal > 0.9)
+        {
 
+        }
         // alarm
 
         // neg

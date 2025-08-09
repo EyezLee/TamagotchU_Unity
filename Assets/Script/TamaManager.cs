@@ -1,3 +1,4 @@
+using AfterimageSample;
 using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
 using Unity.MLAgents.Integrations.Match3;
@@ -30,6 +31,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField] SocketReceiver socketReceiver;
     [SerializeField] FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
+    [SerializeField] bool debugMode = false;
     [Header("Emotion Emulator")]
     [SerializeField][Range(0, 1)] float hypeDebug;
     [SerializeField][Range(0, 1)] float posDebug;
@@ -41,11 +43,32 @@ public class TamaManager : MonoBehaviour
     {
         ProcessTamaEmo();
 
+        float hypeVal = debugMode ? hypeDebug : tamaEmo.hyped;
+        float happyVal = debugMode ? posDebug : tamaEmo.lovey;
+        float alarmVal = debugMode ? alarmingDebug : tamaEmo.alarming;
+        float annoVal = debugMode ? negDebug : tamaEmo.annoyned;
+
+        // calm <-----> hype
         TransformData bounceTrans = BounceMotion(transform);
         TransformData SpinTrans = SpinMotion(transform, sphereCenter);
-        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, hypeDebug);
-        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, hypeDebug);
-        if(bubble) bubble.transform.localScale = new Vector3(1-hypeDebug, 1-hypeDebug, 1 - hypeDebug)*1.5f;
+        transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, hypeVal);
+        transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, hypeVal);
+        if (bubble)
+        {
+            bubble.transform.localScale = new Vector3(1 - hypeVal, 1 - hypeVal, 1 - hypeVal) * 1.05f;
+            bubble.transform.position = transform.position;
+        }
+        if(GetComponent<AfterimageRenderer>() != null)
+        {
+            GetComponent<AfterimageRenderer>().Duration = (int)Mathf.Lerp(1, 125, hypeVal);
+        }
+
+        // happy
+
+        // alarm
+
+        // neg
+
         //Debug.Log(DebugEmo());
     }
 

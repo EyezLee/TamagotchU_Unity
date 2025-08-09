@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace AfterimageSample
 {
@@ -39,30 +40,76 @@ namespace AfterimageSample
         /// <param name="renderers">記憶させるSkinnedMeshRendereの配列.</param>
         public void Setup(Material material, int layer, SkinnedMeshRenderer[] renderers)
         {
+            int count = 0;
             for (int i = 0; i < renderers.Length; i++)
             {
+                //if (renderers[i].tag == "Remove") continue;
                 // マテリアルにnullが渡されたらオブジェクトのマテリアルをそのまま使う.
-                if (material == null)
+                // if (material == null)
+                for (int j = 0; j < renderers[i].sharedMesh.subMeshCount; j++)
                 {
-                    material = renderers[i].material;
+                    material = renderers[i].materials[j];
+                    if (_params[count].material != material)
+                    {
+                        _params[count] = new RenderParams(material);
+                    }
+                    // レイヤーを設定する.
+                    if (_params[count].layer != layer)
+                    {
+                        _params[count].layer = layer;
+                    }
+                    // 現在のメッシュの状態を格納する.
+                    if (_meshes[count] == null)
+                    {
+                        _meshes[count] = new Mesh();
+                    }
+                    Mesh bakedMesh = new Mesh();
+                    renderers[i].BakeMesh(bakedMesh);
+                    _meshes[count] = ExtractTrueSubmesh(bakedMesh, j);
+
+                    _matrices[count] = renderers[i].transform.localToWorldMatrix;
+                    count++;
                 }
-                if (_params[i].material != material)
-                {
-                    _params[i] = new RenderParams(material);
-                }
-                // レイヤーを設定する.
-                if (_params[i].layer != layer)
-                {
-                    _params[i].layer = layer;
-                }
-                // 現在のメッシュの状態を格納する.
-                if (_meshes[i] == null)
-                {
-                    _meshes[i] = new Mesh();
-                }
-                renderers[i].BakeMesh(_meshes[i]);
-                _matrices[i] = renderers[i].transform.localToWorldMatrix;
             }
+        }
+
+        // helper function for extracting submeshes
+        public static Mesh ExtractTrueSubmesh(Mesh mesh, int subMeshIndex)
+        {
+            int[] triangles = mesh.GetTriangles(subMeshIndex);
+            Vector3[] originalVertices = mesh.vertices;
+            Vector3[] originalNormals = mesh.normals;
+            Vector2[] originalUVs = mesh.uv;
+
+            Dictionary<int, int> oldToNewIndex = new Dictionary<int, int>();
+            List<Vector3> newVertices = new List<Vector3>();
+            List<Vector3> newNormals = new List<Vector3>();
+            List<Vector2> newUVs = new List<Vector2>();
+            List<int> newTriangles = new List<int>();
+
+            for (int i = 0; i < triangles.Length; i++)
+            {
+                int oldIndex = triangles[i];
+                int newIndex;
+                if (!oldToNewIndex.TryGetValue(oldIndex, out newIndex))
+                {
+                    newIndex = newVertices.Count;
+                    oldToNewIndex[oldIndex] = newIndex;
+                    newVertices.Add(originalVertices[oldIndex]);
+                    if (originalNormals.Length > oldIndex) newNormals.Add(originalNormals[oldIndex]);
+                    if (originalUVs.Length > oldIndex) newUVs.Add(originalUVs[oldIndex]);
+                }
+                newTriangles.Add(newIndex);
+            }
+
+            Mesh subMesh = new Mesh();
+            subMesh.vertices = newVertices.ToArray();
+            if (newNormals.Count > 0) subMesh.normals = newNormals.ToArray();
+            if (newUVs.Count > 0) subMesh.uv = newUVs.ToArray();
+            subMesh.triangles = newTriangles.ToArray();
+            subMesh.RecalculateBounds();
+            if (newNormals.Count == 0) subMesh.RecalculateNormals();
+            return subMesh;
         }
 
         /// <summary>

@@ -6,12 +6,14 @@ namespace AfterimageSample
     public class AfterimageRenderer : MonoBehaviour
     {
         [SerializeField] Material _material;
-        [SerializeField] int _duration = 150;
+        [SerializeField] public int _duration = 150;
         [SerializeField] int _layer = 6;
 
+        public int Duration { get { return _duration; } set {  _duration = value; } }
         SkinnedMeshRenderer[] _renderers;
         Stack<AfterImage> _pool = new Stack<AfterImage>();
         Queue<AfterImage> _renderQueue = new Queue<AfterImage>();
+
 
         void Awake()
         {
@@ -52,6 +54,13 @@ namespace AfterimageSample
         /// </summary>
         public void Enqueue()
         {
+            // get actual mesh count which take account of submesh counts of mesh
+            int meshCount = 0;
+            for(int i = 0; i < _renderers.Length; i++)
+            {
+                meshCount += _renderers[i].sharedMesh.subMeshCount;
+            }
+
             AfterImage afterimage;
             if (_pool.Count > 0)
             {
@@ -59,7 +68,7 @@ namespace AfterimageSample
             }
             else
             {
-                afterimage = new AfterImage(_renderers.Length);
+                afterimage = new AfterImage(meshCount);
             }
             afterimage.Setup(_material, _layer, _renderers);
             _renderQueue.Enqueue(afterimage);

@@ -112,7 +112,7 @@ Material:
     - _ConservativeDepthOffsetEnable: 0
     - _CullMode: 2
     - _CullModeForward: 2
-    - _Depth: 0.91
+    - _Depth: 0.8
     - _DepthOffsetEnable: 0
     - _DoubleSidedEnable: 0
     - _DoubleSidedGIMode: 0
@@ -125,7 +125,7 @@ Material:
     - _MaterialID: 1
     - _MaterialTypeMask: 2
     - _OpaqueCullMode: 2
-    - _OpaqueDepth: 0.18
+    - _OpaqueDepth: 0.11
     - _PerPixelSorting: 0
     - _QueueControl: 0
     - _QueueOffset: -50
@@ -133,7 +133,7 @@ Material:
     - _ReceivesSSR: 1
     - _ReceivesSSRTransparent: 0
     - _RefractionModel: 0
-    - _RefractionStrength: 0.11
+    - _RefractionStrength: 0.5
     - _RenderQueueType: 4
     - _RequireSplitLighting: 0
     - _SrcBlend: 1
@@ -163,11 +163,11 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.42451942, g: 1, b: 0, a: 1}
-    - _DepthColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DepthColor: {r: 1, g: 0.5813265, b: 0, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _RippleScale: {r: 0.45, g: 0.35, b: 0.17, a: 0.4}
+    - _RippleScale: {r: 0.36, g: -0.27, b: 0.17, a: 0.4}
     - _RippleSpeed: {r: -0.01, g: 0.01, b: -0.05, a: 0.05}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

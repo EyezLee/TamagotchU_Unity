@@ -705,6 +705,7 @@ MonoBehaviour:
   posDebug: 0
   negDebug: 0
   alarmingDebug: 0
+  tamaRenderer: {fileID: 0}
   sphereCenter: {x: 0, y: 0, z: 0}
   sphereRadius: 5
   velocity: {x: 1, y: 2, z: 1.5}
@@ -1251,7 +1252,7 @@ Transform:
   m_GameObject: {fileID: 961739749}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5.192}
+  m_LocalPosition: {x: 11.11, y: 0, z: -11.97}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2551,6 +2552,10 @@ PrefabInstance:
       value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
+      propertyPath: 'm_BlendShapeWeights.Array.data[0]'
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       propertyPath: 'm_BlendShapeWeights.Array.data[1]'
       value: 0
       objectReference: {fileID: 0}
@@ -2934,12 +2939,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 635547659545568360, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1817928049}
-    - targetCorrespondingSourceObject: {fileID: 635547659545568360, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1817928048}
-    - targetCorrespondingSourceObject: {fileID: 635547659545568360, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1817928047}
     - targetCorrespondingSourceObject: {fileID: 9078151466436353510, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1549751842}
@@ -3194,14 +3193,14 @@ MonoBehaviour:
   m_Roots: []
   m_UpdateRate: 24
   m_UpdateMode: 3
-  m_Damping: 0.696
+  m_Damping: 0.9
   m_DampingDistrib:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Elasticity: 0.116
+  m_Elasticity: 0.02
   m_ElasticityDistrib:
     serializedVersion: 2
     m_Curve: []
@@ -3263,35 +3262,6 @@ SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
   m_PrefabInstance: {fileID: 1748141576}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1817928047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 207483962}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 796f3be22490c154190f78aa8a6e8ba0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AfterimageSample.EnqueueAfterimage
-  _afterimageRenderer: {fileID: 919132147682360160}
-  _intervalFrames: 3
---- !u!114 &1817928048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 207483962}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55aa0357ba6487c49b0f649fb6307b35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AfterimageSample.AfterimageRenderer
-  _material: {fileID: 2100000, guid: 76a8bfddb6e56de4faf92cde9ed8ec56, type: 2}
-  _duration: 150
-  _layer: 3
 --- !u!114 &1817928049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4142,11 +4112,12 @@ MonoBehaviour:
   socketReceiver: {fileID: 677559010}
   frameRequester: {fileID: 677559011}
   bubble: {fileID: 1757103116}
-  debugMode: 0
+  debugMode: 1
   hypeDebug: 0
   posDebug: 0
   negDebug: 0
   alarmingDebug: 0
+  tamaRenderer: {fileID: 1817928045}
   sphereCenter: {x: 0, y: 0, z: 0}
   sphereRadius: 3
   velocity: {x: 1, y: 2, z: 1.5}

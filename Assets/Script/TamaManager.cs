@@ -1,4 +1,5 @@
 using AfterimageSample;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics.Geometry;
 using Unity.MLAgents.Integrations.Match3;
@@ -37,13 +38,18 @@ public class TamaManager : MonoBehaviour
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
+    [SerializeField] SkinnedMeshRenderer tamaRenderer;
 
     TamaEmo tamaEmo;
+    private Coroutine happyMouthBlendShape;
+    int mouthShapekeyIndex = 0;
+
     private void Update()
     {
         ProcessTamaEmo();
 
         float hypeVal = debugMode ? hypeDebug : tamaEmo.hyped;
+        float calmVal = 1 - hypeVal;
         float happyVal = debugMode ? posDebug : tamaEmo.lovey;
         float alarmVal = debugMode ? alarmingDebug : tamaEmo.alarming;
         float annoVal = debugMode ? negDebug : tamaEmo.annoyned;
@@ -55,8 +61,9 @@ public class TamaManager : MonoBehaviour
         transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, hypeVal);
         if (bubble)
         {
-            bubble.transform.localScale = new Vector3(1 - hypeVal, 1 - hypeVal, 1 - hypeVal) * 1.05f;
-            bubble.transform.position = transform.position;
+            float scale = Mathf.Lerp(0.15f, 1.0f, calmVal);
+            bubble.transform.localScale = new Vector3(scale, scale, scale);
+            bubble.transform.position = transform.position + new Vector3(0, 0, -0.5f * hypeVal);
         }
         if(GetComponent<AfterimageRenderer>() != null)
         {
@@ -64,15 +71,17 @@ public class TamaManager : MonoBehaviour
         }
 
         // happy
-        if(happyVal > 0.9)
+        if(happyVal > 0.6)
         {
-
+            ChangeMouthShape(0, 100, 0.25f); // open mouth
+            frameRequester.HumanBorn(transform.position); // spawn human fish
+            ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
         // alarm
 
         // neg
 
-        //Debug.Log(DebugEmo());
+        Debug.Log(DebugEmo());
     }
 
     void ProcessTamaEmo()
@@ -110,7 +119,7 @@ public class TamaManager : MonoBehaviour
         tamaEmo.lovey = happyWeightedSum;
         tamaEmo.annoyned = negWeightedSum;
         tamaEmo.alarming = emoTagList.Count / 7.0f; // 7 types of emotion in total
-        tamaEmo.hyped = Mathf.Clamp01(playerEmoCnt / 30.0f);
+        tamaEmo.hyped = Mathf.Clamp01(playerEmoCnt / 15.0f);
         tamaEmo.calm = 1.0f - tamaEmo.hyped;
     }
 
@@ -163,7 +172,7 @@ public class TamaManager : MonoBehaviour
         float angle = spinSpeed * Time.deltaTime;
         Vector3 axis = spinAxis.normalized;
         // Get vector from center of rotation to current position
-        Vector3 offset = trans.position - center;
+        Vector3 offset = new Vector3(Mathf.Sin(Time.fixedTime), Mathf.Cos(Time.fixedTime), 0) * 1.5f - center;
         // Create a quaternion representing the rotation around the axis by the angle
         Quaternion rotation = Quaternion.AngleAxis(angle, axis);
         // Rotate the offset
@@ -175,6 +184,34 @@ public class TamaManager : MonoBehaviour
         return t;
     }
 
+    private void ChangeMouthShape(float startValue, float endValue, float duration)
+    {
+        if (happyMouthBlendShape != null)
+        {
+            StopCoroutine(happyMouthBlendShape);
+        }
+        happyMouthBlendShape = StartCoroutine(ChangeMouthBlendShape(startValue, endValue, duration));
+    }
+
+    private IEnumerator ChangeMouthBlendShape(float startValue, float endValue, float duration)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
+
+            // Interpolate the blend shape value
+            float currentValue = Mathf.Lerp(startValue, endValue, t);
+            tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, currentValue);
+
+            yield return null;
+        }
+
+        // Ensure the final value is set
+        tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, 0);
+    }
 
     public string DebugEmo()
     {

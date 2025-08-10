@@ -17,10 +17,6 @@ Shader "Custom/URP_SimpleReflection"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GlobalIllumination.hlsl"
-            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
-             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
-
 
             struct appdata
             {

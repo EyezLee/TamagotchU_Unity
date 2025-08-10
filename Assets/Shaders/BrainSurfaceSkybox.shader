@@ -182,7 +182,6 @@ Shader "Custom/BrainSurfaceSkybox"
 
                 float3 finalCol = lerp(baseCol, probes.rgb, _ReflectionIntensity);
 
-
                 return float4(finalCol, 1);
             }
             ENDHLSL 

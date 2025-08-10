@@ -50,7 +50,7 @@ public class BlendShapeToVFXBinder : MonoBehaviour
         }
 
         // Check for the 'S' key press to start the coroutine
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             if (blendShapeCoroutine != null)
             {

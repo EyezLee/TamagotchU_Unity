@@ -16,6 +16,7 @@ public class FrameRequester : MonoBehaviour
     Texture2D atlasTexture;
     int cellX = 0;
     int cellY = 0;
+    float cooldown = 0f;
 
     private void Start()
     {
@@ -26,13 +27,22 @@ public class FrameRequester : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F)) // Change 'F' to your desired key
         {
+            HumanBorn(Vector3.zero);
+        }
+        cooldown += Time.deltaTime;
+    }
+
+    public void HumanBorn(Vector3 pos)
+    {
+        if (cooldown > 1.5f)
+        {
             Texture2D receivedTexture = SendFrameRequest();
 
-            if(receivedTexture)
+            if (receivedTexture)
             {
                 int cellIndex = 0;
                 UpdateAtlas(receivedTexture, faceId, out cellIndex);
-                SendVFXEvent(cellIndex);
+                SendVFXEvent(cellIndex, pos);
 
                 faceId++;
 
@@ -40,8 +50,10 @@ public class FrameRequester : MonoBehaviour
             }
             else
             {
+                SendVFXEvent(0, pos);
                 Debug.Log("failed to receive facetexture");
             }
+            cooldown = 0f;
         }
     }
 
@@ -169,7 +181,7 @@ public class FrameRequester : MonoBehaviour
     }
 
     // Sends VFX event to notify particle system of the new atlas cell to use and trigger spawning
-    void SendVFXEvent(int atlasCellIndex)
+    void SendVFXEvent(int atlasCellIndex, Vector3 pos)
     {
         if (vfx != null)
         {
@@ -177,6 +189,7 @@ public class FrameRequester : MonoBehaviour
             vfx.SetInt("CellColume", (int)faceAtlasConfig.y);
             vfx.SetInt("CellX", cellX);
             vfx.SetInt("CellY", cellY);
+            vfx.SetVector3("SpawnPos", pos);
             vfx.SetTexture("FaceAtlas", atlasTexture);
             vfx.SendEvent("Born");
             Debug.Log($"Sent VFX event for AtlasCellIndex {atlasCellIndex}");

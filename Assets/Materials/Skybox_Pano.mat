@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Skybox_Pano
-  m_Shader: {fileID: 4800000, guid: 5604fba7ba25b9e4eb8531b77d48d0f6, type: 3}
+  m_Shader: {fileID: 4800000, guid: fbe9154351c502048a4491053fcc4012, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -131,20 +131,27 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _EnableFade: 0
     - _EnvironmentReflections: 1
     - _Exposure: 0.99
+    - _FadeEnd: 0
+    - _FadeStart: 0
     - _FresnelIntensity: 3.5
     - _FresnelPower: 2.21
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
+    - _GlowIntensity: 0.74
     - _ImageType: 0
+    - _LCDScale: 4
+    - _LEDScale: 55
     - _Layout: 0
     - _Mapping: 1
     - _Metallic: 1
     - _MirrorOnBack: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _PixelDensity: 23.7
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ReflectionIntensity: 0
@@ -156,12 +163,15 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _Specular: 0.35
     - _SpecularHighlights: 1
+    - _Speed: 0.1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _SunDisk: 2
     - _SunSize: 0.04
     - _SunSizeConvergence: 5
     - _Surface: 0
+    - _Transparency: 1
+    - _VoronoiScale: 5
     - _WarpStrength: 0.25
     - _WaveAmplitude: 0.19
     - _WaveSpeed: 0.15
@@ -170,8 +180,10 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BellyColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 0, b: 0, a: 1}
+    - _EndColor: {r: 0, g: 0.020459158, b: 0.06289297, a: 1}
     - _FresnelColor: {r: 0.7610062, g: 0.040682666, b: 0.25682932, a: 1}
     - _GrooveColor: {r: 0.654088, g: 0.06376319, b: 0.46898097, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
@@ -179,6 +191,7 @@ Material:
     - _MainColor: {r: 0.8301887, g: 0.30082312, b: 0.07570895, a: 1}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _StartColor: {r: 1, g: 1, b: 1, a: 1}
     - _Tint: {r: 0.59748423, g: 0.59748423, b: 0.59748423, a: 0.5}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

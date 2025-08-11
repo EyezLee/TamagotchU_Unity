@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: tama
+  m_Name: Mat_Wing
   m_Shader: {fileID: 4800000, guid: b0d89d1016a8f354f93db5eba02665a1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

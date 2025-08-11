@@ -5,12 +5,14 @@ Shader "Custom/Body"
 {
     Properties
     {
+        _EnableFade("Enable Fade", int) = 1
         _FadeStart ("Fade Start (World Y)", Float) = 1.0
         _FadeEnd ("Fade End (World Y)", Float) = 0.0
         _Speed ("Fall Speed", Range(0, 1)) = 1.0
         _EndColor ("Start Color", Color) = (0, 0, 0, 1)
         _StartColor ("End Color", Color) = (1, 1, 1, 1)
-        _PixelDensity ("Pixel Density", Float) = 100.0
+        _BellyColor ("Belly Color", Color) = (1, 1, 1, 1)
+        _LCDScale ("LCD Scale", Float) = 100.0
         _LEDScale ("LED Scale", Float) = 5.0
         _VoronoiScale ("Voronoi Scale", Float) = 5.0
         _GlowIntensity ("Glow Intensity", Float) = 2.0
@@ -35,11 +37,13 @@ Shader "Custom/Body"
             #include "UnityCG.cginc"
 
             // Shader properties
+            int _EnableFade;
             float _FadeStart;
             float _FadeEnd;
             float4 _EndColor;
             float4 _StartColor;
-            float _PixelDensity;
+            float4 _BellyColor;
+            float _LCDScale;
             float _Speed;
             float _GlowIntensity;
             float _LEDScale;
@@ -103,33 +107,6 @@ Shader "Custom/Body"
                 return sqrt(res);
             }
 
-            // Fragment shader
-            /*
-            half4 frag (v2f i) : SV_Target
-            {
-                //Calculate fade factor based on world Y position
-                float fadeFactor = saturate((i.worldPos.y - _FadeEnd) / (_FadeStart - _FadeEnd));
-
-                return float4(subPixelColor.rrr, 1);
-
-                //Animate UVs to make the lava fall
-                float2 uv = i.uv;
-                uv.y += _Time.y * _Speed; //Falling effect
-                uv *= _Scale; Scale the Voronoi pattern
-
-                //Generate Voronoi noise
-                float glow = i.uv.x;
-                float voronoiValue = voronoi(uv, glow);
-
-                //Lava color based on Voronoi value
-                float4 lavaColor = lerp(_StartColor, _EndColor, glow * _GlowIntensity);
-
-                //Add transparency
-                lavaColor.a = _Transparency * (1.0 - voronoiValue) * fadeFactor;
-
-                return float4(subPixelColor, 1);
-            }
-           */
             half4 frag (v2f i) : SV_Target
             {
                 // Simulate a screen distortion normal (procedural or texture)
@@ -177,7 +154,7 @@ Shader "Custom/Body"
                 float alpha = _Transparency * fadeFactor;
 
                 // Chrome effect: RGB shifting bands
-                float2 chromeUV = refractedUV * _PixelDensity * 0.5 + _Time.y * 0.25;
+                float2 chromeUV = refractedUV * _LCDScale * 0.5 + _Time.y * 0.25;
                 float shift = sin(chromeUV.x * 15.0 + chromeUV.y * 5.0);
 
                 // RGB stripe shimmer
@@ -188,17 +165,18 @@ Shader "Custom/Body"
                 );
 
                 // Make chrome subtle and position dependent
-                chromeColor *= 0.5 * fadeFactor; // adjust intensity and fade
+                chromeColor *= 0.5; // adjust intensity and fade
 
                 // Blend into LED color
                 skinColor = lerp(skinColor, skinColor + chromeColor, 0.4) * _GlowIntensity;
                 float skinAlpha = saturate(pow(alpha + glow * alpha, 1));
                 float4 sc = float4(skinColor, skinAlpha);
-                float bellyFadeFactor = saturate((_FadeEnd - i.worldPos.y + voronoiValue) / (_FadeStart - _FadeEnd - 0));
+                float bellyFadeFactor = saturate((_FadeEnd - i.worldPos.y + voronoiValue) / (_FadeStart - _FadeEnd)) * voronoiValue;
                 bellyFadeFactor = pow(bellyFadeFactor, 0.9);
-                float4 bc = float4(bellyFadeFactor, bellyFadeFactor, bellyFadeFactor, bellyFadeFactor);
+                float4 bc = _BellyColor * bellyFadeFactor;
 
-                return lerp(bc, sc, skinAlpha);
+                float4 finalColor = _EnableFade ? lerp(bc, sc, skinAlpha) : float4(skinColor, 1);
+                return finalColor;
                 //return float4(refractedUV, 0, 1);
             }
             ENDCG

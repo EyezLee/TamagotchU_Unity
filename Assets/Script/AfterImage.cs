@@ -32,6 +32,26 @@ namespace AfterimageSample
             FrameCount = 0;
         }
 
+        // optimization
+        private static Stack<Mesh> s_MeshPool = new Stack<Mesh>();
+
+        private Mesh GetMeshFromPool()
+        {
+            return s_MeshPool.Count > 0 ? s_MeshPool.Pop() : new Mesh();
+        }
+
+        private void ReturnMeshToPool(Mesh mesh)
+        {
+            mesh.Clear();
+            s_MeshPool.Push(mesh);
+        }
+        private static List<Vector3> s_Vertices = new List<Vector3>(1024);
+        private static List<Vector3> s_Normals = new List<Vector3>(1024);
+        private static List<Vector2> s_UVs = new List<Vector2>(1024);
+        private static List<int> s_Triangles = new List<int>(1024);
+        private static Dictionary<int, int> s_IndexMap = new Dictionary<int, int>(1024);
+
+
         /// <summary>
         /// メッシュごとに使用するマテリアルを用意し、現在のメッシュの形状を記憶させる.
         /// </summary>
@@ -43,74 +63,84 @@ namespace AfterimageSample
             int count = 0;
             for (int i = 0; i < renderers.Length; i++)
             {
-                //if (renderers[i].tag == "Remove") continue;
-                // マテリアルにnullが渡されたらオブジェクトのマテリアルをそのまま使う.
-                // if (material == null)
                 for (int j = 0; j < renderers[i].sharedMesh.subMeshCount; j++)
                 {
                     material = renderers[i].materials[j];
+
                     if (_params[count].material != material)
                     {
                         _params[count] = new RenderParams(material);
                     }
-                    // レイヤーを設定する.
                     if (_params[count].layer != layer)
                     {
                         _params[count].layer = layer;
                     }
-                    // 現在のメッシュの状態を格納する.
+
+                    // Get baked mesh from pool, clear and bake current frame
+                    Mesh bakedMesh = GetMeshFromPool();
+                    bakedMesh.Clear();
+                    renderers[i].BakeMesh(bakedMesh);
+
+                    // Prepare mesh at _meshes[count] or get pooled
                     if (_meshes[count] == null)
                     {
-                        _meshes[count] = new Mesh();
+                        _meshes[count] = GetMeshFromPool();
                     }
-                    Mesh bakedMesh = new Mesh();
-                    renderers[i].BakeMesh(bakedMesh);
-                    _meshes[count] = ExtractTrueSubmesh(bakedMesh, j);
+                    _meshes[count].Clear();
+
+                    // Fill _meshes[count] from bakedMesh submesh data without new allocations
+                    ExtractTrueSubmeshInto(bakedMesh, j, _meshes[count]);
 
                     _matrices[count] = renderers[i].transform.localToWorldMatrix;
+
+                    // Return bakedMesh to pool after extraction
+                    ReturnMeshToPool(bakedMesh);
+
                     count++;
                 }
             }
         }
 
-        // helper function for extracting submeshes
-        public static Mesh ExtractTrueSubmesh(Mesh mesh, int subMeshIndex)
-        {
-            int[] triangles = mesh.GetTriangles(subMeshIndex);
-            Vector3[] originalVertices = mesh.vertices;
-            Vector3[] originalNormals = mesh.normals;
-            Vector2[] originalUVs = mesh.uv;
 
-            Dictionary<int, int> oldToNewIndex = new Dictionary<int, int>();
-            List<Vector3> newVertices = new List<Vector3>();
-            List<Vector3> newNormals = new List<Vector3>();
-            List<Vector2> newUVs = new List<Vector2>();
-            List<int> newTriangles = new List<int>();
+        // helper function for extracting submeshes
+        public static void ExtractTrueSubmeshInto(Mesh source, int subMeshIndex, Mesh target)
+        {
+            // Clear reusable buffers
+            s_Vertices.Clear();
+            s_Normals.Clear();
+            s_UVs.Clear();
+            s_Triangles.Clear();
+            s_IndexMap.Clear();
+
+            int[] triangles = source.GetTriangles(subMeshIndex);
+            Vector3[] originalVertices = source.vertices;
+            Vector3[] originalNormals = source.normals;
+            Vector2[] originalUVs = source.uv;
 
             for (int i = 0; i < triangles.Length; i++)
             {
                 int oldIndex = triangles[i];
-                int newIndex;
-                if (!oldToNewIndex.TryGetValue(oldIndex, out newIndex))
+                if (!s_IndexMap.TryGetValue(oldIndex, out int newIndex))
                 {
-                    newIndex = newVertices.Count;
-                    oldToNewIndex[oldIndex] = newIndex;
-                    newVertices.Add(originalVertices[oldIndex]);
-                    if (originalNormals.Length > oldIndex) newNormals.Add(originalNormals[oldIndex]);
-                    if (originalUVs.Length > oldIndex) newUVs.Add(originalUVs[oldIndex]);
+                    newIndex = s_Vertices.Count;
+                    s_IndexMap[oldIndex] = newIndex;
+
+                    s_Vertices.Add(originalVertices[oldIndex]);
+                    if (originalNormals != null && originalNormals.Length > oldIndex) s_Normals.Add(originalNormals[oldIndex]);
+                    if (originalUVs != null && originalUVs.Length > oldIndex) s_UVs.Add(originalUVs[oldIndex]);
                 }
-                newTriangles.Add(newIndex);
+                s_Triangles.Add(newIndex);
             }
 
-            Mesh subMesh = new Mesh();
-            subMesh.vertices = newVertices.ToArray();
-            if (newNormals.Count > 0) subMesh.normals = newNormals.ToArray();
-            if (newUVs.Count > 0) subMesh.uv = newUVs.ToArray();
-            subMesh.triangles = newTriangles.ToArray();
-            subMesh.RecalculateBounds();
-            if (newNormals.Count == 0) subMesh.RecalculateNormals();
-            return subMesh;
+            target.Clear();
+            target.SetVertices(s_Vertices);
+            if (s_Normals.Count > 0) target.SetNormals(s_Normals);
+            if (s_UVs.Count > 0) target.SetUVs(0, s_UVs);
+            target.SetTriangles(s_Triangles, 0);
+            target.RecalculateBounds();
+            if (s_Normals.Count == 0) target.RecalculateNormals();
         }
+
 
         /// <summary>
         /// 記憶したメッシュを全て描画する.

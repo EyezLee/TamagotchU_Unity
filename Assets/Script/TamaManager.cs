@@ -82,7 +82,7 @@ public class TamaManager : MonoBehaviour
         // happy
         if(posVal > 0.6)
         {
-            mouthHigh = 100;
+            mouthHigh = 100 * posVal;
             mouthLow = 0;
             if (!debugMode) frameRequester.HumanBorn(transform.position); // spawn human fish unless debug mode
             //ChangeMouthShape(100, 0, 0.25f); // close mouth
@@ -102,12 +102,13 @@ public class TamaManager : MonoBehaviour
         Material skyboxMat = RenderSettings.skybox;
         if (skyboxMat)
         {
-            skyboxMat.SetFloat("_FresnelIntensity", Mathf.Lerp(3.5f, 1f, alarmVal));
-            skyboxMat.SetFloat("_WaveSpeed", Mathf.Lerp(0.15f, 0.5f, alarmVal));
+            skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.25f, alarmVal));
+            skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(55.0f, 4.0f, alarmVal));
+            skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(4.0f, 55.0f, alarmVal));
         }
 
         // neg: shapekeys, material
-        mouthLow = -50;
+        mouthLow = -50 * negVal;
         bodyLow = 100 * negVal;
 
         bodyLerp = negVal;

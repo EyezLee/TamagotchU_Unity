@@ -96,6 +96,7 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
+    - _Emission: 1
     - _EnvironmentReflections: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
@@ -121,6 +122,7 @@ Material:
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
+    - __Emission: 10
     m_Colors:
     - _BaseColor: {r: 0.8575241, g: 0.9064574, b: 0, a: 1}
     - _Color: {r: 0, g: 0.90588236, b: 0.69803923, a: 0.80784315}

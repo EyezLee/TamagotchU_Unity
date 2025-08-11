@@ -13,6 +13,7 @@ Shader "Custom/ToonCartoonCel"
         _SpecColor("Highlight Color", Color) = (1,1,1,1)
         _SpecPower("Highlight Sharpness", Range(1, 100)) = 50
         _SpecThreshold("Highlight Threshold", Range(0, 1)) = 0.95
+        _Emission("Emission Intensity", Range(1, 20)) = 1
     }
 
     SubShader
@@ -42,6 +43,7 @@ Shader "Custom/ToonCartoonCel"
             float4 _SpecColor;
             float _SpecPower;
             float _SpecThreshold;
+            float _Emission;
 
             struct appdata
             {
@@ -94,7 +96,7 @@ Shader "Custom/ToonCartoonCel"
                 float3 texColor = tex2D(_MainTex, i.uv).rgb;
                 float3 finalColor = (baseColor + rimColor + specColor) * texColor;
 
-                return float4(finalColor, _Color.a);
+                return float4(finalColor * _Emission, _Color.a);
             }
             ENDCG
         }

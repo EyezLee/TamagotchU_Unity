@@ -39,6 +39,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
+    [SerializeField] GameObject[] alarms;
 
     TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
@@ -77,9 +78,25 @@ public class TamaManager : MonoBehaviour
             frameRequester.HumanBorn(transform.position); // spawn human fish
             ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
-        // alarm
 
-        // neg
+        // alarm
+        for (int i = 0; i < alarms.Length; i++)
+        {
+            if (alarms[i])
+            {
+                // alarm material
+                float alarmEmi = Mathf.Max(0.0f, (Mathf.Sin(Mathf.Rad2Deg * Time.fixedTime) + 1) * 10 * alarmVal);
+                alarms[i].GetComponent<MeshRenderer>().material.SetFloat("_Emission", Mathf.Lerp(1, alarmEmi, alarmVal));
+                //skybox
+                Material skyboxMat = RenderSettings.skybox;
+                if(skyboxMat)
+                {
+                    skyboxMat.SetFloat("_FresnelIntensity", Mathf.Lerp(3.5f, 1f, alarmVal));
+                }
+            }
+        }
+
+        // neg: shapekeys, material
 
         Debug.Log(DebugEmo());
     }

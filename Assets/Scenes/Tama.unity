@@ -775,7 +775,6 @@ GameObject:
   - component: {fileID: 677559009}
   - component: {fileID: 677559010}
   - component: {fileID: 677559011}
-  - component: {fileID: 677559012}
   m_Layer: 0
   m_Name: SocketStation
   m_TagString: Untagged
@@ -830,35 +829,6 @@ MonoBehaviour:
   debugRenderer: {fileID: 0}
   vfx: {fileID: 2044898582}
   faceAtlasConfig: {x: 5, y: 4, z: 400, w: 400}
---- !u!114 &677559012
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 677559008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3cac520939724d04e9945196050c728a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TamaManager
-  socketReceiver: {fileID: 677559010}
-  frameRequester: {fileID: 677559011}
-  bubble: {fileID: 0}
-  debugMode: 0
-  hypeDebug: 0
-  posDebug: 0
-  negDebug: 0
-  alarmingDebug: 0
-  tamaRenderer: {fileID: 0}
-  alarms: []
-  sphereCenter: {x: 0, y: 0, z: 0}
-  sphereRadius: 5
-  velocity: {x: 1, y: 2, z: 1.5}
-  damping: 0.98
-  accelerationStrength: 0
-  spinAxis: {x: 0, y: 1, z: 0}
-  spinSpeed: 90
 --- !u!4 &696171091 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1291054102719760140, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
@@ -3316,7 +3286,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207483962}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
   m_Name: 
@@ -4169,7 +4139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AfterimageSample.AfterimageRenderer
   _material: {fileID: 0}
-  _duration: 150
+  _duration: 100
   _layer: 3
 --- !u!114 &919132147682360161
 MonoBehaviour:

@@ -46,17 +46,23 @@ public class TamaManager : MonoBehaviour
     int mouthShapekeyIndex = 0;
     int bodyShapekeyIndex = 1;
 
+    float GetAnimateValue(float val)
+    {
+        return Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg * val) * 0.5f + 0.5f; // 0-1
+    }
     private void Update()
     {
         ProcessTamaEmo();
 
         float hypeVal = debugMode ? hypeDebug : tamaEmo.hyped;
         float calmVal = 1 - hypeVal;
-        float happyVal = debugMode ? posDebug : tamaEmo.lovey;
+        float posVal = debugMode ? posDebug : tamaEmo.lovey;
         float alarmVal = debugMode ? alarmingDebug : tamaEmo.alarming;
-        float annoVal = debugMode ? negDebug : tamaEmo.annoyned;
+        float negVal = debugMode ? negDebug : tamaEmo.annoyned;
 
-        float animatedVal = Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg) * 0.5f + 0.5f;
+        float bodyLow = 0, bodyHigh = 100, bodyLerp = negVal;
+        float mouthLow = 0, mouthHigh = 100, mouthLerp = (posVal + negVal) /2.0f;
+
         // calm <-----> hype
         TransformData bounceTrans = BounceMotion(transform);
         TransformData SpinTrans = SpinMotion(transform, sphereCenter);
@@ -74,10 +80,10 @@ public class TamaManager : MonoBehaviour
         }
 
         // happy
-        if(happyVal > 0.6)
+        if(posVal > 0.6)
         {
-            float happyMouthVal = animatedVal * 100;
-            tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, happyMouthVal);
+            mouthHigh = 100;
+            mouthLow = 0;
             if (!debugMode) frameRequester.HumanBorn(transform.position); // spawn human fish unless debug mode
             //ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
@@ -100,10 +106,14 @@ public class TamaManager : MonoBehaviour
             skyboxMat.SetFloat("_WaveSpeed", Mathf.Lerp(0.15f, 0.5f, alarmVal));
         }
 
-
-
         // neg: shapekeys, material
-        tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(0, 100, annoVal));
+        mouthLow = -50;
+        bodyLow = 100 * negVal;
+
+        bodyLerp = negVal;
+        tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
+        mouthLerp = GetAnimateValue(posVal + negVal);
+        tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, Mathf.Lerp(mouthLow, mouthHigh, mouthLerp));
 
         Debug.Log(DebugEmo());
     }

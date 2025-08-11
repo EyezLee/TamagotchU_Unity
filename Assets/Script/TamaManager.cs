@@ -44,6 +44,7 @@ public class TamaManager : MonoBehaviour
     TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
     int mouthShapekeyIndex = 0;
+    int bodyShapekeyIndex = 1;
 
     private void Update()
     {
@@ -55,6 +56,7 @@ public class TamaManager : MonoBehaviour
         float alarmVal = debugMode ? alarmingDebug : tamaEmo.alarming;
         float annoVal = debugMode ? negDebug : tamaEmo.annoyned;
 
+        float animatedVal = Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg) * 0.5f + 0.5f;
         // calm <-----> hype
         TransformData bounceTrans = BounceMotion(transform);
         TransformData SpinTrans = SpinMotion(transform, sphereCenter);
@@ -74,9 +76,10 @@ public class TamaManager : MonoBehaviour
         // happy
         if(happyVal > 0.6)
         {
-            ChangeMouthShape(0, 100, 0.25f); // open mouth
-            frameRequester.HumanBorn(transform.position); // spawn human fish
-            ChangeMouthShape(100, 0, 0.25f); // close mouth
+            float happyMouthVal = animatedVal * 100;
+            tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, happyMouthVal);
+            if (!debugMode) frameRequester.HumanBorn(transform.position); // spawn human fish unless debug mode
+            //ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
 
         // alarm
@@ -85,18 +88,22 @@ public class TamaManager : MonoBehaviour
             if (alarms[i])
             {
                 // alarm material
-                float alarmEmi = Mathf.Max(0.0f, (Mathf.Sin(Mathf.Rad2Deg * Time.fixedTime) + 1) * 10 * alarmVal);
+                float alarmEmi = (Mathf.Sin(Mathf.Rad2Deg * Time.fixedTime) + 1) * 10 * alarmVal;
                 alarms[i].GetComponent<MeshRenderer>().material.SetFloat("_Emission", Mathf.Lerp(1, alarmEmi, alarmVal));
-                //skybox
-                Material skyboxMat = RenderSettings.skybox;
-                if(skyboxMat)
-                {
-                    skyboxMat.SetFloat("_FresnelIntensity", Mathf.Lerp(3.5f, 1f, alarmVal));
-                }
             }
         }
+        //skybox
+        Material skyboxMat = RenderSettings.skybox;
+        if (skyboxMat)
+        {
+            skyboxMat.SetFloat("_FresnelIntensity", Mathf.Lerp(3.5f, 1f, alarmVal));
+            skyboxMat.SetFloat("_WaveSpeed", Mathf.Lerp(0.15f, 0.5f, alarmVal));
+        }
+
+
 
         // neg: shapekeys, material
+        tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(0, 100, annoVal));
 
         Debug.Log(DebugEmo());
     }
@@ -189,7 +196,8 @@ public class TamaManager : MonoBehaviour
         float angle = spinSpeed * Time.deltaTime;
         Vector3 axis = spinAxis.normalized;
         // Get vector from center of rotation to current position
-        Vector3 offset = new Vector3(Mathf.Sin(Time.fixedTime), Mathf.Cos(Time.fixedTime), 0) * 1.5f - center;
+        //Vector3 offset = new Vector3(Mathf.Sin(Time.fixedTime), Mathf.Cos(Time.fixedTime), 0) * 1.5f - center;
+        Vector3 offset = trans.position - center;
         // Create a quaternion representing the rotation around the axis by the angle
         Quaternion rotation = Quaternion.AngleAxis(angle, axis);
         // Rotate the offset
@@ -220,7 +228,9 @@ public class TamaManager : MonoBehaviour
             float t = elapsedTime / duration;
 
             // Interpolate the blend shape value
-            float currentValue = Mathf.Lerp(startValue, endValue, t);
+            //float currentValue = Mathf.Lerp(startValue, endValue, t);
+            float currentValue = Mathf.Sin(Mathf.Rad2Deg * elapsedTime) * 0.5f + 0.5f;
+            currentValue = currentValue * Mathf.Abs(startValue - endValue) + startValue;
             tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, currentValue);
 
             yield return null;

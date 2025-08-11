@@ -1353,10 +1353,10 @@ ReflectionProbe:
   m_Type: 0
   m_Mode: 1
   m_RefreshMode: 1
-  m_TimeSlicingMode: 0
-  m_Resolution: 512
+  m_TimeSlicingMode: 1
+  m_Resolution: 128
   m_UpdateFrequency: 0
-  m_BoxSize: {x: 100, y: 100, z: 100}
+  m_BoxSize: {x: 20, y: 20, z: 20}
   m_BoxOffset: {x: 0, y: 0, z: 0}
   m_NearClip: 0.1
   m_FarClip: 1000
@@ -1383,7 +1383,7 @@ Transform:
   m_GameObject: {fileID: 1102631147}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -3.837}
+  m_LocalPosition: {x: 0, y: 5.91, z: 4.37}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4186,7 +4186,7 @@ MonoBehaviour:
   socketReceiver: {fileID: 677559010}
   frameRequester: {fileID: 677559011}
   bubble: {fileID: 1757103116}
-  debugMode: 0
+  debugMode: 1
   hypeDebug: 0
   posDebug: 0
   negDebug: 0

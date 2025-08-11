@@ -117,7 +117,7 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _Ambient: 0.3
+    - _Ambient: 0.025
     - _AtmosphereThickness: 1
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
@@ -126,15 +126,15 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Detail: 2
+    - _Detail: 2.42
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _Exposure: 0.99
-    - _FresnelIntensity: 2.41
-    - _FresnelPower: 0.8
+    - _FresnelIntensity: 1
+    - _FresnelPower: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -148,13 +148,13 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _ReflectionIntensity: 0
-    - _RidgeIntensity: 2.56
+    - _RidgeIntensity: 1.67
     - _Rotation: 189
-    - _Scale: 1.11
+    - _Scale: -10.02
     - _Shininess: 21.09
-    - _Smoothness: 1
+    - _Smoothness: 0.467
     - _SmoothnessTextureChannel: 0
-    - _Specular: 0.42
+    - _Specular: 0.35
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
@@ -164,7 +164,7 @@ Material:
     - _Surface: 0
     - _WarpStrength: 0.25
     - _WaveAmplitude: 0.19
-    - _WaveSpeed: 0.19
+    - _WaveSpeed: 0.5
     - _WorkflowMode: 0
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
@@ -172,11 +172,11 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 0, b: 0, a: 1}
-    - _FresnelColor: {r: 1, g: 0.25036463, b: 0.003144443, a: 1}
-    - _GrooveColor: {r: 1, g: 0.40566027, b: 0.59026575, a: 1}
+    - _FresnelColor: {r: 0.78616345, g: 0.19422863, b: 0, a: 1}
+    - _GrooveColor: {r: 0.66666657, g: 0.28721166, b: 0.36794683, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
-    - _LightDir: {r: -0.06, g: -0.08, b: 0.3, a: 0}
-    - _MainColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+    - _LightDir: {r: 0, g: 0, b: 0.4, a: 0}
+    - _MainColor: {r: 0.46540874, g: 0.46540874, b: 0.46540874, a: 1}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Tint: {r: 0.59748423, g: 0.59748423, b: 0.59748423, a: 0.5}

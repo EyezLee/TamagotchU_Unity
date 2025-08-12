@@ -195,7 +195,7 @@ namespace UnityEngine.Rendering
 
                 transform.localRotation = Quaternion.Euler(newRotationX, newRotationY, transform.localEulerAngles.z);
 
-                float moveSpeed = Time.deltaTime * m_MoveSpeed;
+                float moveSpeed = Time.unscaledDeltaTime * m_MoveSpeed;
                 if (fire1 || leftShiftBoost && leftShift)
                     moveSpeed *= m_Turbo;
                 transform.position += transform.forward * moveSpeed * inputVertical;

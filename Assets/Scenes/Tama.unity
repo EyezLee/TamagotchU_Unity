@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 203844589}
   - component: {fileID: 203844588}
   - component: {fileID: 203844587}
+  - component: {fileID: 203844590}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -259,13 +260,26 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203844586}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.9642106, y: 0.015417252, z: 0.25835943, w: -0.057537977}
+  m_LocalRotation: {x: 0.77549565, y: 0, z: 0, w: 0.6313529}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 604712594}
-  m_LocalEulerAnglesHint: {x: 186.83, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 101.7, y: 0, z: 0}
+--- !u!114 &203844590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203844586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec2168763f1e6a04a96340820bae6d14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LightYRotation
+  rotationSpeed: 60
 --- !u!4 &206989203 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1024341599866351166, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
@@ -688,6 +702,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 637311475}
+  - component: {fileID: 637311476}
   m_Layer: 0
   m_Name: Env
   m_TagString: Untagged
@@ -713,6 +728,19 @@ Transform:
   - {fileID: 604712594}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &637311476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637311474}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 267c8b4ef590bb345b9f49a21ed0a1e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PauseManager
+  freeCameraScript: {fileID: 961739750}
 --- !u!1 &673267473
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,7 +1355,7 @@ ReflectionProbe:
   m_Resolution: 128
   m_UpdateFrequency: 0
   m_BoxSize: {x: 20, y: 20, z: 20}
-  m_BoxOffset: {x: 0, y: 0, z: 0}
+  m_BoxOffset: {x: 0, y: 4.34, z: 1.16}
   m_NearClip: 0.1
   m_FarClip: 1000
   m_ShadowDistance: 100
@@ -1353,7 +1381,7 @@ Transform:
   m_GameObject: {fileID: 1102631147}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.91, z: 4.37}
+  m_LocalPosition: {x: 0, y: 2.09, z: 3.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1631,6 +1659,11 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7371818513897604878, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
   m_PrefabInstance: {fileID: 1748141576}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &1272633863 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
+  m_PrefabInstance: {fileID: 1688069228}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1330525208 stripped
 Transform:
@@ -1925,6 +1958,129 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectMotionFeed
   skinnedRenderer: {fileID: 1549751841}
   targetMaterial: {fileID: 2100000, guid: ac405492fe3a28d43b5b249d595b1914, type: 2}
+--- !u!1 &1636128273
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1636128274}
+  - component: {fileID: 1636128276}
+  - component: {fileID: 1636128275}
+  m_Layer: 0
+  m_Name: Thorn_VFX
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1636128274
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636128273}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1688069229}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!73398921 &1636128275
+VFXRenderer:
+  serializedVersion: 1
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636128273}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!2083052967 &1636128276
+VisualEffect:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1636128273}
+  m_Enabled: 1
+  m_Asset: {fileID: 8926484042661614526, guid: 02fe1920a0c80bc49a305fe17641dfde, type: 3}
+  m_InitialEventName: OnPlay
+  m_InitialEventNameOverriden: 0
+  m_StartSeed: 0
+  m_ResetSeedOnPlay: 1
+  m_AllowInstancing: 1
+  m_ResourceVersion: 1
+  m_PropertySheet:
+    m_Float:
+      m_Array:
+      - m_Value: 388.66
+        m_Name: ThornScale
+        m_Overridden: 1
+    m_Vector2f:
+      m_Array: []
+    m_Vector3f:
+      m_Array: []
+    m_Vector4f:
+      m_Array: []
+    m_Uint:
+      m_Array: []
+    m_Int:
+      m_Array: []
+    m_Matrix4x4f:
+      m_Array: []
+    m_AnimationCurve:
+      m_Array: []
+    m_Gradient:
+      m_Array: []
+    m_NamedObject:
+      m_Array:
+      - m_Value: {fileID: 1272633863}
+        m_Name: SkinnedMeshRenderer
+        m_Overridden: 1
+    m_Bool:
+      m_Array: []
 --- !u!1 &1637371111
 GameObject:
   m_ObjectHideFlags: 0
@@ -2078,7 +2234,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1636128274}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       insertIndex: -1
@@ -4060,7 +4219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DynamicBone
   m_Root: {fileID: 1090530774}
   m_Roots: []
-  m_UpdateRate: 60
+  m_UpdateRate: 20
   m_UpdateMode: 3
   m_Damping: 0.1
   m_DampingDistrib:

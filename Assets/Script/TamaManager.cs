@@ -104,7 +104,7 @@ public class TamaManager : MonoBehaviour
         {
             skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.25f, alarmVal));
             skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(55.0f, 4.0f, alarmVal));
-            skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(4.0f, 55.0f, alarmVal));
+            skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(1.0f, 55.0f, alarmVal));
         }
 
         // neg: shapekeys, material
@@ -185,7 +185,7 @@ public class TamaManager : MonoBehaviour
             Vector3 normal = toCenter.normalized;
             velocity = Vector3.Reflect(velocity, normal);
             velocity *= damping;
-            velocity += Random.insideUnitSphere * 0.2f;
+            velocity += Random.insideUnitSphere * 0.5f;
         }
         t.position = pos;
         // Align mesh forward direction to velocity if velocity is non-zero

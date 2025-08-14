@@ -183,7 +183,7 @@ Material:
     - _BellyColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 0, b: 0, a: 1}
-    - _EndColor: {r: 0, g: 0.020459158, b: 0.06289297, a: 1}
+    - _EndColor: {r: 0, g: 0, b: 0, a: 1}
     - _FresnelColor: {r: 0.7610062, g: 0.040682666, b: 0.25682932, a: 1}
     - _GrooveColor: {r: 0.654088, g: 0.06376319, b: 0.46898097, a: 1}
     - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}

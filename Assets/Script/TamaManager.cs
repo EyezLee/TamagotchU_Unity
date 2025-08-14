@@ -6,7 +6,7 @@ using Unity.MLAgents.Integrations.Match3;
 using Unity.VisualScripting;
 using UnityEngine;
 
-struct TamaEmo
+public struct TamaEmo
 {
     public float calm;
     public float hyped;
@@ -41,7 +41,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
     [SerializeField] GameObject[] alarms;
 
-    TamaEmo tamaEmo;
+    public TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
     int mouthShapekeyIndex = 0;
     int bodyShapekeyIndex = 1;

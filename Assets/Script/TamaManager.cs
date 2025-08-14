@@ -32,14 +32,21 @@ public class TamaManager : MonoBehaviour
     [SerializeField] SocketReceiver socketReceiver;
     [SerializeField] FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
-    [SerializeField] bool debugMode = false;
+    [SerializeField] SkinnedMeshRenderer tamaRenderer;
+    [SerializeField] GameObject[] alarms;
+    [Header("Audio Source")]
+    [SerializeField] AudioSource calmAudio;
+    [SerializeField] AudioSource hypeAudio;
+    [SerializeField] AudioSource posAudio;
+    [SerializeField] AudioSource negAudio;
+    [SerializeField] AudioSource alarmAudio;
     [Header("Emotion Emulator")]
+    [SerializeField] bool debugMode = false;
     [SerializeField][Range(0, 1)] float hypeDebug;
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
-    [SerializeField] SkinnedMeshRenderer tamaRenderer;
-    [SerializeField] GameObject[] alarms;
+
 
     public TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
@@ -49,6 +56,19 @@ public class TamaManager : MonoBehaviour
     float GetAnimateValue(float val)
     {
         return Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg * val) * 0.5f + 0.5f; // 0-1
+    }
+    private void Start()
+    {
+        calmAudio.loop = true;
+        calmAudio.Play();
+        hypeAudio.loop = true;
+        hypeAudio.Play();
+        posAudio.loop = true;
+        posAudio.Play(); 
+        negAudio.loop = true; 
+        negAudio.Play();
+        alarmAudio.loop = true;
+        alarmAudio.Play();
     }
     private void Update()
     {
@@ -78,6 +98,8 @@ public class TamaManager : MonoBehaviour
         {
             GetComponent<AfterimageRenderer>().Duration = (int)Mathf.Lerp(1, 125, hypeVal);
         }
+        calmAudio.volume = calmVal;
+        hypeAudio.volume = hypeVal;
 
         // happy
         if(posVal > 0.6)
@@ -87,6 +109,8 @@ public class TamaManager : MonoBehaviour
             if (!debugMode) frameRequester.HumanBorn(transform.position); // spawn human fish unless debug mode
             //ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
+        posAudio.volume = Mathf.Pow(posVal, 4);
+        posAudio.pitch = Mathf.Pow(posVal * 2, 2);
 
         // alarm
         for (int i = 0; i < alarms.Length; i++)
@@ -98,19 +122,23 @@ public class TamaManager : MonoBehaviour
                 alarms[i].GetComponent<MeshRenderer>().material.SetFloat("_Emission", Mathf.Lerp(1, alarmEmi, alarmVal));
             }
         }
-        //skybox
         Material skyboxMat = RenderSettings.skybox;
         if (skyboxMat)
         {
             skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.25f, alarmVal));
             skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(55.0f, 4.0f, alarmVal));
             skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(1.0f, 55.0f, alarmVal));
+            skyboxMat.SetFloat("_VoronoiScale", Mathf.Lerp(5.0f, 1.0f, alarmVal));
         }
+        alarmAudio.volume = alarmVal;
+        alarmAudio.pitch = alarmVal * 2;
 
         // neg: shapekeys, material
         mouthLow = -50 * negVal;
         bodyLow = 100 * negVal;
+        negAudio.volume = negVal;
 
+        // shapekeys
         bodyLerp = negVal;
         tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
         mouthLerp = GetAnimateValue(posVal + negVal);
@@ -158,7 +186,7 @@ public class TamaManager : MonoBehaviour
         tamaEmo.calm = 1.0f - tamaEmo.hyped;
     }
 
-
+    [Header("Bounce Motion")]
     public Vector3 sphereCenter = Vector3.zero;
     public float sphereRadius = 5f;
     public Vector3 velocity = new Vector3(1, 2, 1.5f);
@@ -197,7 +225,7 @@ public class TamaManager : MonoBehaviour
         return t;
     }
 
-
+    [Header("Spin Motion")]
     // Axis around which the mesh spins
     public Vector3 spinAxis = Vector3.up;
     // Rotation speed in degrees per second

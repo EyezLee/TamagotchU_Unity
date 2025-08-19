@@ -92,7 +92,7 @@ public class FrameRequester : MonoBehaviour
         atlasTexture.Apply();
 
         // debug: assign to material or shader that will use the atlas
-        debugRenderer.material.mainTexture = atlasTexture;
+        if(debugRenderer) debugRenderer.material.mainTexture = atlasTexture;
     }
 
     Texture2D SendFrameRequest()

@@ -32,6 +32,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField] SocketReceiver socketReceiver;
     [SerializeField] FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
+    [SerializeField] GameObject tamaBg;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
     [SerializeField] GameObject[] alarms;
     [Header("Audio Source")]
@@ -99,10 +100,11 @@ public class TamaManager : MonoBehaviour
             GetComponent<AfterimageRenderer>().Duration = (int)Mathf.Lerp(1, 125, hypeVal);
         }
         calmAudio.volume = calmVal;
-        hypeAudio.volume = hypeVal;
+        hypeAudio.volume = hypeVal * 0.85f;
+        hypeAudio.pitch = hypeVal * 1;
 
         // happy
-        if(posVal > 0.6)
+        if(posVal > 0.5)
         {
             mouthHigh = 100 * posVal;
             mouthLow = 0;
@@ -141,10 +143,12 @@ public class TamaManager : MonoBehaviour
         // shapekeys
         bodyLerp = negVal;
         tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
+        tamaBg.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
         mouthLerp = GetAnimateValue(posVal + negVal);
         tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, Mathf.Lerp(mouthLow, mouthHigh, mouthLerp));
+        tamaBg.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, Mathf.Lerp(mouthLow, mouthHigh, posVal - negVal));
 
-        Debug.Log(DebugEmo());
+        //Debug.Log(DebugEmo());
     }
 
     void ProcessTamaEmo()
@@ -163,7 +167,7 @@ public class TamaManager : MonoBehaviour
             if (!emoTagList.Contains(emoTag))
                 emoTagList.Add(emoTag);
 
-            int weight = i + 1;
+            int weight = i + 2;
             if (emoTag == "Happiness")
             {
                 happyWeightedSum += emoVal * weight;
@@ -180,9 +184,9 @@ public class TamaManager : MonoBehaviour
         happyWeightedSum /= totalPosWeight;
         negWeightedSum /= totalNegWeight;
         tamaEmo.lovey = happyWeightedSum;
-        tamaEmo.annoyned = negWeightedSum;
-        tamaEmo.alarming = emoTagList.Count / 7.0f; // 7 types of emotion in total
-        tamaEmo.hyped = Mathf.Clamp01(playerEmoCnt / 15.0f);
+        tamaEmo.annoyned = Mathf.Pow(negWeightedSum, 0.8f);
+        tamaEmo.alarming = Mathf.Pow(emoTagList.Count / 7.0f, 0.45f); // 7 types of emotion in total
+        tamaEmo.hyped = Mathf.Clamp01(playerEmoCnt / 5f);
         tamaEmo.calm = 1.0f - tamaEmo.hyped;
     }
 

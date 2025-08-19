@@ -104,7 +104,7 @@ public class TamaManager : MonoBehaviour
         hypeAudio.pitch = hypeVal * 1;
 
         // happy
-        if(posVal > 0.5)
+        if(posVal > 0.56)
         {
             mouthHigh = 100 * posVal;
             mouthLow = 0;
@@ -156,7 +156,7 @@ public class TamaManager : MonoBehaviour
         int playerEmoCnt = socketReceiver.PlayerEmoEntries.Count;
 
         float happyWeightedSum = 0, negWeightedSum = 0;
-        int totalPosWeight = 1, totalNegWeight = 1;
+        float totalPosWeight = 1, totalNegWeight = 1;
         List<string> emoTagList = new List<string>();
 
         // Weights: oldest = 1, newest = count (simple linear scale)
@@ -167,7 +167,7 @@ public class TamaManager : MonoBehaviour
             if (!emoTagList.Contains(emoTag))
                 emoTagList.Add(emoTag);
 
-            int weight = i + 2;
+            float weight = i + 1.25f;
             if (emoTag == "Happiness")
             {
                 happyWeightedSum += emoVal * weight;

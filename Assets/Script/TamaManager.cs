@@ -127,10 +127,10 @@ public class TamaManager : MonoBehaviour
         Material skyboxMat = RenderSettings.skybox;
         if (skyboxMat)
         {
-            skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.25f, alarmVal));
-            skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(55.0f, 4.0f, alarmVal));
-            skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(1.0f, 55.0f, alarmVal));
-            skyboxMat.SetFloat("_VoronoiScale", Mathf.Lerp(5.0f, 1.0f, alarmVal));
+            skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.45f, alarmVal));
+            skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(65.0f, 1.0f, alarmVal));
+            skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(5.0f, 95.0f, alarmVal));
+            skyboxMat.SetFloat("_VoronoiScale", Mathf.Lerp(7.0f, 0.0f, alarmVal));
         }
         alarmAudio.volume = alarmVal;
         alarmAudio.pitch = alarmVal * 2;
@@ -173,7 +173,7 @@ public class TamaManager : MonoBehaviour
                 happyWeightedSum += emoVal * weight;
                 totalPosWeight += weight;
             }
-            else if (emoTag == "Sadness" || emoTag == "Fear" | emoTag == "Disgust" | emoTag == "Anger")
+            else if (emoTag == "Sadness" || emoTag == "Fear" | emoTag == "Disgust" | emoTag == "Anger" | emoTag == "Surprise")
             {
                 negWeightedSum += emoVal * weight;
                 totalNegWeight += weight;

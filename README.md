@@ -7,4 +7,5 @@ Experience Instruction:
 - Download the latest release (release session on right side)
 - Unzip and run .exe
 
+Tama-pager companion app repo: https://github.com/EyezLee/tama_pager
 

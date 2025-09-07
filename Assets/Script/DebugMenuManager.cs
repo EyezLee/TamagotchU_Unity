@@ -11,7 +11,7 @@ public class TamaIPPair
     public TamaIPPair(TamaManager manager)
     {
         tamaManager = manager;
-        IPAddress = tamaManager.frameRequester.pythonServerIp;
+        IPAddress = tamaManager.tamapagerIP;
     }
 }
 public class DebugMenuManager : MonoBehaviour

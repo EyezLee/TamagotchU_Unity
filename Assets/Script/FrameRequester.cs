@@ -6,7 +6,7 @@ using UnityEngine.VFX;
 
 public class FrameRequester : MonoBehaviour
 {
-    public string pythonServerIp = "PYTHON_PC_IP"; // replace with real IP
+    //public string pythonServerIp = "PYTHON_PC_IP"; // replace with real IP
     public int pythonPort = 6006;
     [SerializeField] Renderer debugRenderer;
     [SerializeField] VisualEffect vfx;
@@ -42,11 +42,11 @@ public class FrameRequester : MonoBehaviour
         cooldown += Time.deltaTime;
     }
 
-    public void HumanBorn(Vector3 pos)
+    public void HumanBorn(Vector3 pos, string ip)
     {
         if (cooldown > 1.5f)
         {
-            Texture2D receivedTexture = SendFrameRequest();
+            Texture2D receivedTexture = SendFrameRequest(ip);
 
             if (receivedTexture)
             {
@@ -86,11 +86,11 @@ public class FrameRequester : MonoBehaviour
         if(debugRenderer) debugRenderer.material.mainTexture = atlasTexture;
     }
 
-    Texture2D SendFrameRequest()
+    Texture2D SendFrameRequest(string ip)
     {
         try
         {
-            using (TcpClient client = new TcpClient(pythonServerIp, pythonPort))
+            using (TcpClient client = new TcpClient(ip, pythonPort))
             using (NetworkStream stream = client.GetStream())
             {
                 // Simple request - can be "FRAME", or protocol as you want

@@ -29,8 +29,9 @@ public struct TransformData
 
 public class TamaManager : MonoBehaviour
 {
-    [SerializeField] SocketReceiver socketReceiver;
-    [SerializeField] FrameRequester frameRequester;
+    [Header("Config")]
+    [SerializeField] public SocketReceiver socketReceiver;
+    [SerializeField] public FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
     [SerializeField] GameObject tamaBg;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
@@ -48,7 +49,6 @@ public class TamaManager : MonoBehaviour
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
 
-
     public TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
     int mouthShapekeyIndex = 0;
@@ -58,6 +58,7 @@ public class TamaManager : MonoBehaviour
     {
         return Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg * val) * 0.5f + 0.5f; // 0-1
     }
+
     private void Start()
     {
         calmAudio.loop = true;

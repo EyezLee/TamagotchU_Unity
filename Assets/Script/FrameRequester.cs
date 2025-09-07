@@ -12,8 +12,6 @@ public class FrameRequester : MonoBehaviour
     [SerializeField] VisualEffect vfx;
     [SerializeField] Vector4 faceAtlasConfig; // (numX, numY, resX, resY)
 
-    bool showDebugMenu = false;
-    string ipInput = "";
     int faceId = 0;
     Texture2D atlasTexture;
     int cellX = 0;
@@ -22,12 +20,11 @@ public class FrameRequester : MonoBehaviour
 
     void Awake()
     {
-        // Load previously saved IP (if exists)
+/*        // Load previously saved IP (if exists)
         if (PlayerPrefs.HasKey("PythonServerIP"))
         {
             pythonServerIp = PlayerPrefs.GetString("PythonServerIP");
-        }
-        ipInput = pythonServerIp;
+        }*/
     }
 
     private void Start()
@@ -41,12 +38,6 @@ public class FrameRequester : MonoBehaviour
                 {
                     HumanBorn(Vector3.zero);
                 }*/
-
-        // Toggle debug UI with ESC
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            showDebugMenu = !showDebugMenu;
-        }
 
         cooldown += Time.deltaTime;
     }
@@ -138,32 +129,6 @@ public class FrameRequester : MonoBehaviour
             Debug.LogError($"FrameRequest error: {ex}");
             return null;
         }
-    }
-
-    void OnGUI()
-    {
-        if (!showDebugMenu) return;
-
-        GUILayout.BeginArea(new Rect(20, 20, 300, 150), GUI.skin.window);
-        GUILayout.Label("Debug Menu");
-
-        GUILayout.Label("Python Server IP:");
-        ipInput = GUILayout.TextField(ipInput);
-
-        GUILayout.Space(10);
-        if (GUILayout.Button("Save"))
-        {
-            pythonServerIp = ipInput;
-            PlayerPrefs.SetString("PythonServerIP", pythonServerIp);
-            PlayerPrefs.Save();
-            Debug.Log("PythonServerIP saved: " + pythonServerIp);
-        }
-
-        if (GUILayout.Button("Close"))
-        {
-            showDebugMenu = false;
-        }
-        GUILayout.EndArea();
     }
 
     // Updates the atlas texture by copying newTexture pixels into atlas cell at 'index'

@@ -29,6 +29,7 @@ public class TimedEntry
 
 public class SocketReceiver : MonoBehaviour
 {
+    public string pythonClientIP = "PYTHON_PC_IP"; // replace with real IP
     public int port = 5005;
 
     // Received data accessible in Inspector or other scripts
@@ -122,9 +123,10 @@ public class SocketReceiver : MonoBehaviour
     private void ListenForData()
     {
         _listener = new TcpListener(IPAddress.Any, port);
+        //_listener = new TcpListener(IPAddress.Parse(pythonClientIP), port);
         _listener.Start();
 
-        Debug.Log($"[SocketReceiver] Listening on port {port}");
+        Debug.Log($"{pythonClientIP} Listening on port {port}");
 
         try
         {

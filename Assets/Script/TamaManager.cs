@@ -30,6 +30,7 @@ public struct TransformData
 public class TamaManager : MonoBehaviour
 {
     [Header("Config")]
+    [SerializeField] public string tamapagerIP = "127.0.0.1";
     [SerializeField] public SocketReceiver socketReceiver;
     [SerializeField] public FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
@@ -48,8 +49,14 @@ public class TamaManager : MonoBehaviour
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
+    [Header("Spin Motion")]
+    // Axis around which the mesh spins
+    public Vector3 spinAxis = Vector3.up;
+    // Rotation speed in degrees per second
+    public float spinSpeed = 90f;
 
-    public TamaEmo tamaEmo;
+    private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
+    private TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
     int mouthShapekeyIndex = 0;
     int bodyShapekeyIndex = 1;
@@ -154,7 +161,9 @@ public class TamaManager : MonoBehaviour
 
     void ProcessTamaEmo()
     {
-        int playerEmoCnt = socketReceiver.PlayerEmoEntries.Count;
+        socketReceiver.GetClientDataList(tamapagerIP, cachedMetaDataList);
+
+        int playerEmoCnt = cachedMetaDataList.Count;
 
         float happyWeightedSum = 0, negWeightedSum = 0;
         float totalPosWeight = 1, totalNegWeight = 1;
@@ -163,8 +172,8 @@ public class TamaManager : MonoBehaviour
         // Weights: oldest = 1, newest = count (simple linear scale)
         for (int i = 0; i < playerEmoCnt; i++)
         {
-            string emoTag = socketReceiver.PlayerEmoEntries[i].message;
-            float emoVal = socketReceiver.PlayerEmoEntries[i].value;
+            string emoTag = cachedMetaDataList[i].message;
+            float emoVal = cachedMetaDataList[i].value;
             if (!emoTagList.Contains(emoTag))
                 emoTagList.Add(emoTag);
 
@@ -230,11 +239,6 @@ public class TamaManager : MonoBehaviour
         return t;
     }
 
-    [Header("Spin Motion")]
-    // Axis around which the mesh spins
-    public Vector3 spinAxis = Vector3.up;
-    // Rotation speed in degrees per second
-    public float spinSpeed = 90f;
     TransformData SpinMotion(Transform trans, Vector3 center)
     {
         float angle = spinSpeed * Time.deltaTime;

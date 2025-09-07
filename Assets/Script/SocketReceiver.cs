@@ -3,11 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Collections.Concurrent;
-using UnityEngine;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public class MetaData
@@ -15,183 +12,174 @@ public class MetaData
     public string message;
     public float value;
 }
+
 public class TimedEntry
 {
     public string message;
     public float value;
-    public float timestamp;  // Time.time value when added
+    public DateTime timestamp;
 
     public override string ToString()
     {
-        return $"[{timestamp:F2}] {message}: {value}";
+        return $"[{timestamp:HH:mm:ss.fff}] {message}: {value}";
     }
 }
 
 public class SocketReceiver : MonoBehaviour
 {
-    public string pythonClientIP = "PYTHON_PC_IP"; // replace with real IP
     public int port = 5005;
 
-    // Received data accessible in Inspector or other scripts
-    public string receivedString;
-    public float receivedFloat;
-
-    private Thread _listenThread;
     private TcpListener _listener;
     private volatile bool _listening = false;
+    private readonly object clientsLock = new object();
 
-    // Thread-safe queue to communicate between thread and Update()
-    private ConcurrentQueue<MetaData> _dataQueue = new ConcurrentQueue<MetaData>();
+    // Map from client IP to list of timed entries (reuse lists for performance)
+    private readonly Dictionary<string, List<TimedEntry>> clientTimedEntries = new Dictionary<string, List<TimedEntry>>();
 
-    // Time-limited timed entries list
-    private List<TimedEntry> playerEmoEntries = new List<TimedEntry>();
-    public ReadOnlyCollection<TimedEntry> PlayerEmoEntries
-    {
-        get { return playerEmoEntries.AsReadOnly(); }
-    }
+    private float cleanupInterval = 3f; // seconds
+    private float cleanupTimer = 0f;
 
     void Start()
     {
         _listening = true;
-        _listenThread = new Thread(ListenForData);
-        _listenThread.IsBackground = true;
-        _listenThread.Start();
+        _listener = new TcpListener(IPAddress.Any, port);
+        _listener.Start();
+
+        Thread listenerThread = new Thread(ListenForClients);
+        listenerThread.IsBackground = true;
+        listenerThread.Start();
+
+        Debug.Log($"Listening on port {port}");
     }
 
     void OnDestroy()
     {
         _listening = false;
-        if (_listener != null)
-            _listener.Stop();
+        _listener.Stop();
+    }
 
-        if (_listenThread != null && _listenThread.IsAlive)
-            _listenThread.Abort();
+    private void ListenForClients()
+    {
+        while (_listening)
+        {
+            if (!_listener.Pending())
+            {
+                Thread.Sleep(10);
+                continue;
+            }
+
+            TcpClient client = _listener.AcceptTcpClient();
+            string clientIP = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+            Debug.Log($"Client connected: {clientIP}");
+
+            Thread clientThread = new Thread(() => HandleClient(client, clientIP));
+            clientThread.IsBackground = true;
+            clientThread.Start();
+        }
+    }
+
+    private void HandleClient(TcpClient client, string clientIP)
+    {
+        NetworkStream stream = client.GetStream();
+
+        try
+        {
+            while (_listening && client.Connected)
+            {
+                byte[] lenBuf = ReadExactly(stream, 4);
+                if (lenBuf == null) break;
+
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(lenBuf);
+                int metaLength = BitConverter.ToInt32(lenBuf, 0);
+
+                byte[] metaBuf = ReadExactly(stream, metaLength);
+                if (metaBuf == null) break;
+
+                string metaJson = Encoding.UTF8.GetString(metaBuf);
+                MetaData meta = JsonUtility.FromJson<MetaData>(metaJson);
+
+                lock (clientsLock)
+                {
+                    if (!clientTimedEntries.TryGetValue(clientIP, out var entries))
+                    {
+                        entries = new List<TimedEntry>();
+                        clientTimedEntries[clientIP] = entries;
+                    }
+
+                    entries.Add(new TimedEntry
+                    {
+                        message = meta.message,
+                        value = meta.value,
+                        timestamp = DateTime.UtcNow
+                    });
+
+                    // Remove entries older than 3 seconds
+                    DateTime cutoff = DateTime.UtcNow.AddSeconds(-cleanupInterval);
+                    entries.RemoveAll(e => e.timestamp < cutoff);
+
+                    // Sort only if needed, entries mostly added in order, so this is cheap
+                    entries.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"Client {clientIP} disconnected or error: {ex.Message}");
+        }
+        finally
+        {
+            client.Close();
+            lock (clientsLock)
+            {
+                clientTimedEntries.Remove(clientIP);
+            }
+            Debug.Log($"Disconnected client {clientIP}");
+        }
     }
 
     void Update()
     {
-        // 1. Dequeue any received data and update fields
-        while (_dataQueue.TryDequeue(out MetaData meta))
+        cleanupTimer += Time.deltaTime;
+        if (cleanupTimer >= cleanupInterval)
         {
-            receivedString = meta.message;
-            receivedFloat = meta.value;
-            //Debug.Log($"Received message: {receivedString}, value: {receivedFloat}");
-
-            // add received data
-            playerEmoEntries.Add(new TimedEntry
-            {
-                message = meta.message,
-                value = meta.value,
-                timestamp = Time.time
-            });
-        }
-
-        // 2. Remove entries older than 3 seconds
-        float now = Time.time;
-        playerEmoEntries.RemoveAll(entry => (now - entry.timestamp) > 3.0f);
-
-        // 3. Optional: keep list sorted by timestamp ascending (oldest first)
-        // This makes weighted sum easier — oldest at index 0, newest at last index
-        playerEmoEntries.Sort((a, b) => a.timestamp.CompareTo(b.timestamp));
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Debug.Log("Entries:\n" + string.Join("\n", playerEmoEntries));
+            cleanupTimer = 0f;
+            CleanOldEntries();
         }
     }
 
-    public float GetWeightedSum()
+    private void CleanOldEntries()
     {
-        if (playerEmoEntries.Count == 0)
-            return 0f;
-
-        float sum = 0f;
-        float totalWeight = 0f;
-        int count = playerEmoEntries.Count;
-
-        // Weights: oldest = 1, newest = count (simple linear scale)
-        for (int i = 0; i < count; i++)
+        lock (clientsLock)
         {
-            int weight = i + 1;
-            sum += playerEmoEntries[i].value * weight;
-            totalWeight += weight;
-        }
-
-        return sum / totalWeight;  // normalize weighted average
-    }
-
-    private void ListenForData()
-    {
-        _listener = new TcpListener(IPAddress.Any, port);
-        //_listener = new TcpListener(IPAddress.Parse(pythonClientIP), port);
-        _listener.Start();
-
-        Debug.Log($"{pythonClientIP} Listening on port {port}");
-
-        try
-        {
-            while (_listening)
+            DateTime cutoff = DateTime.UtcNow.AddSeconds(-3);
+            foreach (var entries in clientTimedEntries.Values)
             {
-                if (!_listener.Pending())
-                {
-                    Thread.Sleep(20);
-                    continue;
-                }
-
-                TcpClient client = _listener.AcceptTcpClient();
-
-                using (NetworkStream stream = client.GetStream())
-                {
-                    try
-                    {
-                        while (client.Connected && _listening)
-                        {
-                            // Read 4 bytes length (big endian)
-                            byte[] lenBuf = ReadExactly(stream, 4);
-                            if (lenBuf == null) break;  // client disconnected
-
-                            if (BitConverter.IsLittleEndian)
-                                Array.Reverse(lenBuf);
-                            int metaLength = BitConverter.ToInt32(lenBuf, 0);
-
-                            // Read JSON metadata bytes
-                            byte[] metaBuf = ReadExactly(stream, metaLength);
-                            if (metaBuf == null) break;  // client disconnected
-
-                            string metaJson = Encoding.UTF8.GetString(metaBuf);
-
-                            // Deserialize JSON metadata
-                            MetaData meta = JsonUtility.FromJson<MetaData>(metaJson);
-
-                            // Enqueue to be processed on main thread
-                            _dataQueue.Enqueue(meta);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"[SocketReceiver] Stream reading exception: {ex}");
-                    }
-                }
-
-                client.Close();
+                entries.RemoveAll(e => e.timestamp < cutoff);
             }
         }
-        catch (ThreadAbortException)
+    }
+
+    /// <summary>
+    /// Gets the current valid TimedEntry list for a client IP.
+    /// Reuses a single list per client IP to reduce GC pressure.
+    /// </summary>
+    public void GetClientDataList(string clientIP, List<TimedEntry> outList)
+    {
+        outList.Clear();
+        lock (clientsLock)
         {
-            // Expected on exit, no action needed
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[SocketReceiver] Exception: {ex}");
-        }
-        finally
-        {
-            _listener.Stop();
+            if (clientTimedEntries.TryGetValue(clientIP, out var entries))
+            {
+                outList.AddRange(entries);
+            }
+            else
+            {
+                Debug.LogWarning($"Client IP '{clientIP}' not found in data queues.");
+            }
         }
     }
 
-
-    // Helper method to read exactly 'len' bytes or return null if disconnected
     private byte[] ReadExactly(NetworkStream stream, int len)
     {
         byte[] buffer = new byte[len];
@@ -199,7 +187,8 @@ public class SocketReceiver : MonoBehaviour
         while (read < len)
         {
             int r = stream.Read(buffer, read, len - read);
-            if (r == 0) return null; // disconnected
+            if (r == 0)
+                return null;
             read += r;
         }
         return buffer;

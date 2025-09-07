@@ -403,6 +403,87 @@ MonoBehaviour:
     m_DampPosition: 0.5
     m_DampRotation: 0.5
     m_MaintainAim: 1
+--- !u!1 &165615955
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 165615958}
+  - component: {fileID: 165615957}
+  - component: {fileID: 165615956}
+  - component: {fileID: 165615959}
+  m_Layer: 0
+  m_Name: Network
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &165615956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165615955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f99c4ba95b283854da332018fd7911bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FrameRequester
+  pythonServerIp: 192.168.2.74
+  pythonPort: 6006
+  debugRenderer: {fileID: 0}
+  vfx: {fileID: 2044898582}
+  faceAtlasConfig: {x: 5, y: 4, z: 400, w: 400}
+--- !u!114 &165615957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165615955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 366bcb41a6457f34b8c58ea38eef7fda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SocketReceiver
+  port: 5005
+--- !u!4 &165615958
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165615955}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.12552, y: 1.48303, z: -3.84718}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &165615959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 165615955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b303f5fd8c34604e991a9bddf31c69e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DebugMenuManager
+  tamaPairs:
+  - tamaManager: {fileID: 919132147682360161}
+    IPAddress: 192.168.2.74
+  - tamaManager: {fileID: 454355410}
+    IPAddress: 192.168.2.65
 --- !u!1 &203844586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,6 +1545,10 @@ PrefabInstance:
       value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 493f30198cc49284490fa4632d89ffa7, type: 2}
+    - target: {fileID: 1630794972795428178, guid: 0f39d51e6fb365744a6b7d3b0b75c5fc, type: 3}
       propertyPath: 'm_BlendShapeWeights.Array.data[0]'
       value: -50
       objectReference: {fileID: 0}
@@ -2233,8 +2318,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cac520939724d04e9945196050c728a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TamaManager
-  socketReceiver: {fileID: 1761636614}
-  frameRequester: {fileID: 1761636613}
+  tamapagerIP: 192.168.2.65
+  socketReceiver: {fileID: 165615957}
+  frameRequester: {fileID: 165615956}
   bubble: {fileID: 1284021901}
   tamaBg: {fileID: 955368808}
   tamaRenderer: {fileID: 454355353}
@@ -2246,18 +2332,18 @@ MonoBehaviour:
   posAudio: {fileID: 845251915}
   negAudio: {fileID: 792992048}
   alarmAudio: {fileID: 1600457648}
-  debugMode: 1
+  debugMode: 0
   hypeDebug: 0
   posDebug: 0
   negDebug: 0
   alarmingDebug: 0
+  spinAxis: {x: 0, y: 0, z: 1}
+  spinSpeed: 180
   sphereCenter: {x: 0, y: 0, z: 0}
   sphereRadius: 3
   velocity: {x: 1, y: 2, z: 1.5}
   damping: 0.98
   accelerationStrength: 0.2
-  spinAxis: {x: 0, y: 0, z: 1}
-  spinSpeed: 180
 --- !u!114 &454355411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2583,8 +2669,6 @@ MonoBehaviour:
   tamaPairs:
   - tamaManager: {fileID: 919132147682360161}
     IPAddress: 192.168.2.74
-  - tamaManager: {fileID: 454355410}
-    IPAddress: 192.168.2.65
 --- !u!1 &673267473
 GameObject:
   m_ObjectHideFlags: 0
@@ -3537,8 +3621,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 904983247}
-  - component: {fileID: 904983249}
-  - component: {fileID: 904983248}
   m_Layer: 0
   m_Name: TM_0
   m_TagString: Untagged
@@ -3563,39 +3645,6 @@ Transform:
   - {fileID: 1757103117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &904983248
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 904983246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f99c4ba95b283854da332018fd7911bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FrameRequester
-  pythonServerIp: 192.168.2.74
-  pythonPort: 6006
-  debugRenderer: {fileID: 0}
-  vfx: {fileID: 2044898582}
-  faceAtlasConfig: {x: 5, y: 4, z: 400, w: 400}
---- !u!114 &904983249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 904983246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 366bcb41a6457f34b8c58ea38eef7fda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SocketReceiver
-  pythonClientIP: 192.168.2.74
-  port: 5005
-  receivedString: 
-  receivedFloat: 0
 --- !u!1 &912132080
 GameObject:
   m_ObjectHideFlags: 0
@@ -7073,8 +7122,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1761636615}
-  - component: {fileID: 1761636614}
-  - component: {fileID: 1761636613}
   m_Layer: 0
   m_Name: TM_1
   m_TagString: Untagged
@@ -7082,39 +7129,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1761636613
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761636612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f99c4ba95b283854da332018fd7911bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FrameRequester
-  pythonServerIp: 192.168.2.65
-  pythonPort: 6006
-  debugRenderer: {fileID: 0}
-  vfx: {fileID: 838228753}
-  faceAtlasConfig: {x: 5, y: 4, z: 400, w: 400}
---- !u!114 &1761636614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1761636612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 366bcb41a6457f34b8c58ea38eef7fda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SocketReceiver
-  pythonClientIP: 192.168.2.65
-  port: 5005
-  receivedString: 
-  receivedFloat: 0
 --- !u!4 &1761636615
 Transform:
   m_ObjectHideFlags: 0
@@ -8564,8 +8578,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cac520939724d04e9945196050c728a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TamaManager
-  socketReceiver: {fileID: 904983249}
-  frameRequester: {fileID: 904983248}
+  tamapagerIP: 192.168.2.74
+  socketReceiver: {fileID: 165615957}
+  frameRequester: {fileID: 165615956}
   bubble: {fileID: 1757103116}
   tamaBg: {fileID: 955368808}
   tamaRenderer: {fileID: 1817928045}
@@ -8577,23 +8592,24 @@ MonoBehaviour:
   posAudio: {fileID: 845251915}
   negAudio: {fileID: 792992048}
   alarmAudio: {fileID: 1600457648}
-  debugMode: 1
+  debugMode: 0
   hypeDebug: 0
   posDebug: 0
   negDebug: 0
   alarmingDebug: 0
+  spinAxis: {x: 0, y: 0, z: 1}
+  spinSpeed: 180
   sphereCenter: {x: 0, y: 0, z: 0}
   sphereRadius: 3
   velocity: {x: 1, y: 2, z: 1.5}
   damping: 0.98
   accelerationStrength: 0.2
-  spinAxis: {x: 0, y: 0, z: 1}
-  spinSpeed: 180
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 961739753}
+  - {fileID: 165615958}
   - {fileID: 637311475}
   - {fileID: 904983247}
   - {fileID: 1761636615}

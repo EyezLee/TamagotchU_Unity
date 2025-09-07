@@ -52,15 +52,13 @@ public class DebugMenuManager : MonoBehaviour
             if (GUILayout.Button("Save"))
             {
                 // Apply input back to TamaManager instance
-                pair.tamaManager.frameRequester.pythonServerIp = pair.IPAddress;
-                pair.tamaManager.socketReceiver.pythonClientIP = pair.IPAddress;
+                pair.tamaManager.tamapagerIP = pair.IPAddress;
 
                 // Save to player prefs for persistence
-                PlayerPrefs.SetString($"Tama_{i}_ServerIP", pair.tamaManager.frameRequester.pythonServerIp);
-                PlayerPrefs.SetString($"Tama_{i}_ClientIP", pair.tamaManager.socketReceiver.pythonClientIP);
+                PlayerPrefs.SetString($"Tamapager_{i}_IP", pair.tamaManager.tamapagerIP);
                 PlayerPrefs.Save();
 
-                Debug.Log($"Saved TamaManager[{i}]: ServerIP='{pair.tamaManager.frameRequester.pythonServerIp}', ClientIP='{pair.tamaManager.socketReceiver.pythonClientIP}'");
+                Debug.Log($"Saved TamaManager[{i}]: tamapager IP ='{pair.tamaManager.tamapagerIP}'");
             }
 
             GUILayout.Box("", GUILayout.ExpandWidth(true), GUILayout.Height(2)); // Visual divider

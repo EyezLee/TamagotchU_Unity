@@ -117,7 +117,6 @@ public class TamaManager : MonoBehaviour
             mouthHigh = 100 * posVal;
             mouthLow = 0;
             if (!debugMode) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
-            //ChangeMouthShape(100, 0, 0.25f); // close mouth
         }
         posAudio.volume = Mathf.Pow(posVal, 4);
         posAudio.pitch = Mathf.Pow(posVal * 2, 2);

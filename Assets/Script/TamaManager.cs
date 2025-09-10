@@ -49,6 +49,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
+    [SerializeField] KeyCode testKey;
     [Header("Spin Motion")]
     // Axis around which the mesh spins
     public Vector3 spinAxis = Vector3.up;
@@ -120,6 +121,11 @@ public class TamaManager : MonoBehaviour
         }
         posAudio.volume = Mathf.Pow(posVal, 4);
         posAudio.pitch = Mathf.Pow(posVal * 2, 2);
+
+        if(Input.GetKeyDown(testKey))
+        {
+            frameRequester.HumanBorn(transform.position, tamapagerIP);
+        }
 
         // alarm
         for (int i = 0; i < alarms.Length; i++)

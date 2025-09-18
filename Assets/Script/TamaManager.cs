@@ -56,6 +56,8 @@ public class TamaManager : MonoBehaviour
     // Rotation speed in degrees per second
     public float spinSpeed = 90f;
 
+    float faceCamDist = float.MaxValue;
+
     private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
     private TamaEmo tamaEmo;
     private Coroutine happyMouthBlendShape;
@@ -82,7 +84,7 @@ public class TamaManager : MonoBehaviour
     }
     private void Update()
     {
-        ProcessTamaEmo();
+        ProcessTamaData();
 
         float hypeVal = debugMode ? hypeDebug : tamaEmo.hyped;
         float calmVal = 1 - hypeVal;
@@ -112,12 +114,14 @@ public class TamaManager : MonoBehaviour
         hypeAudio.volume = hypeVal * 0.85f;
         hypeAudio.pitch = hypeVal * 1;
 
+        if (!debugMode && faceCamDist <=20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
+        Debug.Log(faceCamDist);
+
         // happy
-        if(posVal > 0.56)
+        if (posVal > 0.56)
         {
             mouthHigh = 100 * posVal;
             mouthLow = 0;
-            if (!debugMode) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
         }
         posAudio.volume = Mathf.Pow(posVal, 4);
         posAudio.pitch = Mathf.Pow(posVal * 2, 2);
@@ -164,7 +168,7 @@ public class TamaManager : MonoBehaviour
         //Debug.Log(DebugEmo());
     }
 
-    void ProcessTamaEmo()
+    void ProcessTamaData()
     {
         socketReceiver.GetClientDataList(tamapagerIP, cachedMetaDataList);
 
@@ -177,22 +181,24 @@ public class TamaManager : MonoBehaviour
         // Weights: oldest = 1, newest = count (simple linear scale)
         for (int i = 0; i < playerEmoCnt; i++)
         {
-            string emoTag = cachedMetaDataList[i].message;
+            string dataTag = cachedMetaDataList[i].message;
             float emoVal = cachedMetaDataList[i].value;
-            if (!emoTagList.Contains(emoTag))
-                emoTagList.Add(emoTag);
+            if (!emoTagList.Contains(dataTag))
+                emoTagList.Add(dataTag);
 
             float weight = i + 1.25f;
-            if (emoTag == "Happiness")
+            if (dataTag == "Happiness")
             {
                 happyWeightedSum += emoVal * weight;
                 totalPosWeight += weight;
             }
-            else if (emoTag == "Sadness" || emoTag == "Fear" | emoTag == "Disgust" | emoTag == "Anger" | emoTag == "Surprise")
+            else if (dataTag == "Sadness" || dataTag == "Fear" | dataTag == "Disgust" | dataTag == "Anger" | dataTag == "Surprise")
             {
                 negWeightedSum += emoVal * weight;
                 totalNegWeight += weight;
             }
+
+            faceCamDist = cachedMetaDataList[playerEmoCnt-1].dist;
         }
 
         // normalize weighted average

@@ -11,12 +11,14 @@ public class MetaData
 {
     public string message;
     public float value;
+    public float dist;
 }
 
 public class TimedEntry
 {
     public string message;
     public float value;
+    public float dist;
     public DateTime timestamp;
 
     public override string ToString()
@@ -111,10 +113,11 @@ public class SocketReceiver : MonoBehaviour
                     {
                         message = meta.message,
                         value = meta.value,
+                        dist = meta.dist,
                         timestamp = DateTime.UtcNow
                     });
 
-                    // Remove entries older than 3 seconds
+                    // Remove elements older than 3 seconds
                     DateTime cutoff = DateTime.UtcNow.AddSeconds(-cleanupInterval);
                     entries.RemoveAll(e => e.timestamp < cutoff);
 

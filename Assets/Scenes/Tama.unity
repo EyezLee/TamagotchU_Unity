@@ -8332,7 +8332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cac520939724d04e9945196050c728a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TamaManager
-  tamapagerIP: 192.168.2.74
+  tamapagerIP: 192.168.0.101
   socketReceiver: {fileID: 165615957}
   frameRequester: {fileID: 165615956}
   bubble: {fileID: 1757103116}

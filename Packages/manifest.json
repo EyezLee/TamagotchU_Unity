@@ -4,6 +4,7 @@
     "com.esotericsoftware.spine.spine-unity": "https://github.com/EsotericSoftware/spine-runtimes.git?path=spine-unity/Assets/Spine#4.3-beta",
     "com.esotericsoftware.spine.spine-unity-examples": "https://github.com/EsotericSoftware/spine-runtimes.git?path=spine-unity/Assets/Spine Examples#4.3-beta",
     "com.esotericsoftware.spine.urp-shaders": "https://github.com/EsotericSoftware/spine-runtimes.git?path=spine-unity/Modules/com.esotericsoftware.spine.urp-shaders#4.3-beta",
+    "com.madsbangh.easybuttons": "https://github.com/madsbangh/EasyButtons.git#upm",
     "com.unity.ai.assistant": "1.0.0-pre.8",
     "com.unity.ai.generators": "1.0.0-pre.15",
     "com.unity.ai.navigation": "2.0.8",

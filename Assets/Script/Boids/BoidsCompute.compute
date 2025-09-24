@@ -1,0 +1,266 @@
+#pragma enable_d3d11_debug_symbols // render doc macro
+
+#pragma kernel ResetKernel
+#pragma kernel MoveAgentKernel
+#pragma kernel DiffuseTrailKernel
+#pragma kernel Write2DataKernel
+
+#define PI 3.14159
+
+struct Agent
+{
+    float2 pos;
+    float2 vel;
+    float2 acc;
+    float spd;
+    float m; // mass
+};
+RWStructuredBuffer<Agent> _AgentBuffer;
+RWStructuredBuffer<Agent> _AgentPrevBuffer;
+
+int _AgentCount;
+int _ResX;
+int _ResY;
+float _Time;
+float _DiffuseFactor, _Evaporate;
+int _Range;
+float _AlignMaxForce;
+float _CohesionMaxForce;
+float _SeparationMaxForce;
+float _BoidsWeight;
+
+// sensor properties
+float _SensorWeight;
+float _RA; // rotate angle
+int _SO; // sensor offset
+float _SA; // sensor angle
+float _Swirl;
+
+RWTexture2D<float4> _DataMap;
+Texture2D<float4> _TrailReadMap;
+SamplerState sampler_TrailReadMap;
+RWTexture2D<float4> _TrailMap;
+
+// fluid influence
+Texture2D<float2> _FluidMap;
+float _FluidWeight;
+
+// functions properties
+float2 randdir(float2 p);
+float2 rand(float2 p);
+
+float2 boids(int3 id, Agent a);
+float2 fluids(int3 id, Agent a);
+float2 limit(float2 d, float f);
+float2 physarum(int3 id, Agent a);
+
+
+[numthreads(32,32,1)]
+void ResetKernel(uint3 id : SV_DispatchThreadID)
+{
+    // reset buffer
+    int idx = id.y + id.x * _ResX; // flatten 2d texture id to 1d buffer id
+    if (idx < _AgentCount)
+    {
+        Agent a = _AgentBuffer[idx];
+        float2 r = rand(id.xy + float2(idx * 0.001, _Time * 0.001));
+        a.pos = float2(r.x * _ResX, r.y * _ResY);
+        //a.pos = float2(_ResX / 2.0, _ResY / 2.0);
+        a.vel = randdir(float2(idx % 5500.0, sin(_Time % 600)) * cos(_Time % 7000));
+        a.acc = 0;
+        a.spd = 2 * clamp(length(rand(a.vel + id.xx * 0.0023 + _Time % 654)), 0.1, 1);
+        a.m = length(rand(id.xy + float2(_Time * 0.002, id.y))) * 2;
+        _AgentBuffer[idx] = a;
+        _AgentPrevBuffer[idx] = a;
+    }
+
+    // reset texture
+    _DataMap[id.xy] = 0;
+    _TrailMap[id.xy] = 0;
+}
+
+[numthreads(64, 1, 1)]
+void MoveAgentKernel(uint3 id : SV_DispatchThreadID)
+{
+    Agent a = _AgentPrevBuffer[id.x];
+    // remove previous data from map
+    _DataMap[round(a.pos)] *= float4(0, 1, 1, 1);
+    
+    // physarum influence
+    a.acc = _SensorWeight * physarum(id, a);
+    a.vel += a.acc;
+    a.pos += a.vel * a.spd;
+    
+    // fluid influence
+    float2 fluidForce = _FluidWeight * _FluidMap[round(a.pos)];
+    a.acc = fluidForce / a.m;
+    a.vel += a.acc;
+    a.pos += a.vel;
+    
+ 
+    // boids influence
+    a.acc = _BoidsWeight * boids(id, a);
+    //a.acc -= fluidForce / a.m;
+    a.vel += a.acc;
+    a.pos += a.vel * a.spd;
+    
+
+	// set bond
+    a.pos.x = a.pos.x < 0 ? _ResX - 1 : a.pos.x;
+    a.pos.y = a.pos.y < 0 ? _ResY - 1 : a.pos.y;
+    a.pos %= float2(_ResX, _ResY);
+    
+    _AgentBuffer[id.x] = a;
+}
+
+[numthreads(64, 1, 1)]
+void Write2DataKernel(uint3 id : SV_DispatchThreadID)
+{
+    // write to r and g channels to preserve a copy for movement calculation sampling
+    Agent a = _AgentBuffer[id.x];
+    float4 data = _DataMap[round(a.pos)];
+    float trail = clamp(data.y + 1, 0, 1);
+    _DataMap[round(a.pos)] = float4(1, trail, 0, 0);
+}
+
+[numthreads(32, 32, 1)]
+void DiffuseTrailKernel(uint3 id : SV_DispatchThreadID)
+{
+    float sum = 0;
+    
+    for (int y = -1; y <= 1; y++)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            float2 coord = (id.xy + float2(x, y));
+            sum += _DataMap[round(coord)].y;
+        }
+    }
+
+    sum = sum / 9 * _DiffuseFactor;
+    sum *= (1 - pow(_Evaporate, 2));
+    sum = clamp(sum, 0, 1);
+    _DataMap[id.xy] = float4(_DataMap[id.xy].x, sum, _DataMap[id.xy].zw);
+    _TrailMap[id.xy] = float4(sum, 0, 0, 0);
+    
+    //_TrailMap[id.xy] = _FluidMap[id.xy];
+}
+
+
+// ---------------------- utilitie -------------------------
+float2 boids(int3 id, Agent a)
+{
+    float2 acc = 0;
+    float2 alignment = 0, cohesion = 0, separation = 0;
+    int num = 0;
+    
+    // inside of cone range
+    for (int i = 0; i < _AgentCount; i++)
+    {
+        Agent currAgent = _AgentPrevBuffer[i];
+        float dist = length(currAgent.pos - a.pos);
+        
+        if (dist < _Range && i != id.x)
+        {
+            alignment += normalize(currAgent.vel);
+            cohesion += currAgent.pos;
+            separation += (a.pos - currAgent.pos) / length(a.pos - currAgent.pos);
+            num++;
+        }
+    }
+    
+    if (num > 0)
+    {
+        alignment = alignment / num - a.vel;
+        cohesion = (cohesion / num - a.pos) - a.vel;
+        separation = separation - a.vel;
+    }
+    
+    // cap alignment acceleration with max force as a = f/m
+    alignment = length(alignment) > _AlignMaxForce ? limit(alignment, _AlignMaxForce) : alignment;
+    cohesion = length(cohesion) > _CohesionMaxForce ? limit(cohesion, _CohesionMaxForce) : cohesion;
+    separation = length(separation) > _SeparationMaxForce ? limit(separation, _SeparationMaxForce) : separation;
+    
+    // a = f / m
+    acc += alignment / a.m;
+    acc += cohesion / a.m;
+    acc += separation / a.m;
+    
+    return acc;
+}
+
+float2 fluids(uint3 id, Agent a)
+{
+    float2 force = _FluidMap[round(a.pos)];
+    return force;
+}
+
+float r2d(float rad)
+{
+    return rad * (180 / PI);
+}
+
+float d2r(float deg)
+{
+    return deg * (PI / 180);
+}
+
+float2 rotVec(float2 vec, float deg)
+{
+    float rad = d2r(deg);
+    float2x2 rotMat =
+    {
+        { cos(rad), -sin(rad) },
+        { sin(rad), cos(rad) }
+    };
+    return normalize(mul(rotMat, normalize(vec)));
+}
+
+// https://uwe-repository.worktribe.com/output/980579 
+float2 physarum(int3 id, Agent a)
+{
+    float2 vel = a.vel;
+
+	// jeff jones model parameters
+    float2 FL = rotVec(a.vel, _RA);
+    float2 FR = rotVec(a.vel, -_RA);
+
+	// get SL SR F pos 
+    float2 SF = a.pos + _SO * normalize(a.vel);
+    float2 SL = a.pos + _SO * rotVec(a.vel, _SA);
+    float2 SR = a.pos + _SO * rotVec(a.vel, -_SA);
+
+    float levelF = _TrailMap[round(SF)].x;
+    float levelL = _TrailMap[round(SL)].x;
+    float levelR = _TrailMap[round(SR)].x;
+	
+	// compare value in each sensor area
+    if ((levelF < levelL) && (levelF < levelR)) // turn randomly left or right by angle RA
+        vel = rand((float2(_Time, _Time) + id.xx) % 6900) > 0.5 ? FL : FR;
+    else if (levelL < levelR)
+        vel = FR + _Swirl; // turn right
+    else if (levelL > levelR)
+        vel = FL - _Swirl; // turn left
+
+    return vel - a.vel;
+}
+
+float2 limit(float2 d, float f)
+{
+    float l = length(d);
+    return float2(f * d.x / l, f * d.y / l);
+}
+
+// random function from https://www.shadertoy.com/view/lscczl
+float2 rand(float2 p)
+{
+    float3 a = frac(float3(p.xyx) * float3(213.897, 653.453, 253.098));
+    a += dot(a, a.yzx + 79.76);
+    return frac(float2(a.x * a.y, a.y * a.z));
+}
+
+
+float2 randdir(float2 p)
+{
+    return normalize(rand(p) * 2 - 1); // [-1, 1]
+}

@@ -38,6 +38,13 @@
       },
       "hash": "9e9f52ad625ac78665d067109796e01a3457a40b"
     },
+    "com.madsbangh.easybuttons": {
+      "version": "https://github.com/madsbangh/EasyButtons.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "73d2383899210da808a1b27329cdaa8000de557b"
+    },
     "com.unity.ai.assistant": {
       "version": "1.0.0-pre.8",
       "depth": 0,

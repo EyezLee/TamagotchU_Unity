@@ -16,14 +16,14 @@ public class MetaData
 
 public class TimedEntry
 {
-    public string message;
+    public string tag;
     public float value;
     public float dist;
     public DateTime timestamp;
 
     public override string ToString()
     {
-        return $"[{timestamp:HH:mm:ss.fff}] {message}: {value}";
+        return $"[{timestamp:HH:mm:ss.fff}] {tag}: {value}";
     }
 }
 
@@ -111,7 +111,7 @@ public class SocketReceiver : MonoBehaviour
 
                     entries.Add(new TimedEntry
                     {
-                        message = meta.message,
+                        tag = meta.message,
                         value = meta.value,
                         dist = meta.dist,
                         timestamp = DateTime.UtcNow

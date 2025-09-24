@@ -61,8 +61,6 @@ public class TamaManager : MonoBehaviour
     [SerializeField] float radiansPerSecond = 1f;
     [SerializeField] Transform cameraOrigin;
     [SerializeField] public Bounds swimBounds = new Bounds(Vector3.zero, new Vector3(10f, 3f, 10f));
-    [SerializeField] float swimSpeed = 1f;
-    [SerializeField] float turnSpeed = 30f;
     [SerializeField] Transform cave; 
 
     [Header("Audio Source")]
@@ -90,9 +88,9 @@ public class TamaManager : MonoBehaviour
         public float accelerationStrength = 0f; // set >0 for gravity, e.g., 9.8f*/
 
     float faceCamDist = float.MaxValue;
-    private Vector3 swimDirection;
+    private float swimForce = 5f;    // Swim-away force magnitude
     Vector3 velocity;
-    float damping = 0.98f; // slows it down a bit each bounce
+    float damping = 0.5f; // slows it down a bit each bounce
 
     private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
     private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector4(0, 0, 0, 0));
@@ -107,17 +105,9 @@ public class TamaManager : MonoBehaviour
     int mouthShapekeyIndex = 0;
     int bodyShapekeyIndex = 1;
 
-    float GetAnimateValue(float val)
-    {
-        return Mathf.Sin(Time.fixedTime * Mathf.Rad2Deg * val) * 0.5f + 0.5f; // 0-1
-    }
-
     private void Start()
     {
-        // Start swimming horizontally in object's forward direction
-        swimDirection = -transform.forward;
-        swimDirection.y = 0;
-        swimDirection.Normalize();
+        velocity = UnityEngine.Random.insideUnitSphere * 1f;
 
         boundsMin = swimBounds.min + swimBounds.center;
         boundsMax = swimBounds.max + swimBounds.center;
@@ -331,11 +321,7 @@ public class TamaManager : MonoBehaviour
 
     private void NeutralSwim()
     {
-        Vector3 acceleration = Vector3.zero;
-        // Uncomment either gravity or center-seeking acceleration as needed
-        // acceleration = Vector3.down * accelerationStrength;  // Downward gravity
-        // acceleration = (swimBounds.center - transform.position).normalized * accelerationStrength;  // Toward center
-
+        Vector3 acceleration = (swimBounds.center - transform.position).normalized * 0.5f;
         Vector3 pos = transform.position;
 
         // Apply acceleration to velocity
@@ -390,7 +376,7 @@ public class TamaManager : MonoBehaviour
             velocity *= damping;
 
             // Add some random noise to velocity for more natural movement
-            velocity += UnityEngine.Random.insideUnitSphere * 0.5f;
+            velocity += UnityEngine.Random.insideUnitSphere * 1f;
         }
 
         transform.position = pos;
@@ -416,6 +402,32 @@ public class TamaManager : MonoBehaviour
         }
 
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        TamaManager otherFish = collision.gameObject.GetComponent<TamaManager>();
+        if (otherFish != null)
+        {
+            Vector3 collisionDir = (transform.position - collision.transform.position).normalized;
+            Vector3 randomDir = Quaternion.Euler(0, UnityEngine.Random.Range(-45f, 45f), 0) * collisionDir;
+
+            velocity += (randomDir + UnityEngine.Random.insideUnitSphere * 0.3f).normalized * swimForce;
+            otherFish.ReceiveSwimAwayForce(-randomDir);
+
+            velocity *= damping;
+        }
+
+        // tamaEmo change
+
+        sfxList[5].Play();
+    }
+
+    public void ReceiveSwimAwayForce(Vector3 forceDirection)
+    {
+        velocity += (forceDirection + UnityEngine.Random.insideUnitSphere * 0.3f).normalized * swimForce;
+        velocity *= damping;
+    }
+
 
     void MoveAndRotateTowards(Vector3 target, Vector3 directionToFace)
     {

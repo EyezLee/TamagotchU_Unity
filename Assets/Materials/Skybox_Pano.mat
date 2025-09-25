@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Skybox_Pano
-  m_Shader: {fileID: 4800000, guid: fbe9154351c502048a4491053fcc4012, type: 3}
+  m_Shader: {fileID: 4800000, guid: 8c8d23550bb8e4d43abc910fedb39c6b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -143,8 +143,8 @@ Material:
     - _GlossyReflections: 0
     - _GlowIntensity: 1.76
     - _ImageType: 0
-    - _LCDScale: 65
-    - _LEDScale: 5
+    - _LCDScale: 86.59
+    - _LEDScale: 12.52
     - _Layout: 0
     - _Mapping: 1
     - _Metallic: 1
@@ -171,7 +171,7 @@ Material:
     - _SunSizeConvergence: 5
     - _Surface: 0
     - _Transparency: 1
-    - _VoronoiScale: 7
+    - _VoronoiScale: 16.9
     - _WarpStrength: 0.25
     - _WaveAmplitude: 0.19
     - _WaveSpeed: 0.15
@@ -191,7 +191,7 @@ Material:
     - _MainColor: {r: 0.8301887, g: 0.30082312, b: 0.07570895, a: 1}
     - _SkyTint: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _StartColor: {r: 1, g: 1, b: 1, a: 1}
+    - _StartColor: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
     - _Tint: {r: 0.59748423, g: 0.59748423, b: 0.59748423, a: 0.5}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

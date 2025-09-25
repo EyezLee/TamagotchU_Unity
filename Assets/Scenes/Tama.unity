@@ -2105,7 +2105,9 @@ MonoBehaviour:
   tamapagerIP: 192.168.2.65
   socketReceiver: {fileID: 165615957}
   frameRequester: {fileID: 165615956}
+  id: 1
   bubble: {fileID: 1284021901}
+  thornVFX: {fileID: 956489568}
   tamaBg: {fileID: 955368808}
   tamaRenderer: {fileID: 454355353}
   alarms:
@@ -2124,12 +2126,6 @@ MonoBehaviour:
   - {fileID: 1389490951}
   - {fileID: 1939757163}
   - {fileID: 1988009062}
-  debugMode: 0
-  hypeDebug: 0
-  posDebug: 0
-  negDebug: 0
-  alarmingDebug: 0
-  testKey: 103
 --- !u!114 &454355411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5214,7 +5210,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7414,6 +7410,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 543450651952144867}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -7491,7 +7499,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 160c76ac41e4ffb4fa831fb431c88229, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8998,7 +9006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AfterimageSample.EnqueueAfterimage
   _afterimageRenderer: {fileID: 919132147682360160}
-  _intervalFrames: 50
+  _intervalFrames: 10
 --- !u!114 &919132147682360160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9029,7 +9037,9 @@ MonoBehaviour:
   tamapagerIP: 192.168.0.101
   socketReceiver: {fileID: 165615957}
   frameRequester: {fileID: 165615956}
+  id: 0
   bubble: {fileID: 1757103116}
+  thornVFX: {fileID: 1974690081}
   tamaBg: {fileID: 955368808}
   tamaRenderer: {fileID: 1817928045}
   alarms:
@@ -9048,12 +9058,6 @@ MonoBehaviour:
   - {fileID: 1600457648}
   - {fileID: 1049033058}
   - {fileID: 942330554}
-  debugMode: 0
-  hypeDebug: 0
-  posDebug: 0
-  negDebug: 0
-  alarmingDebug: 0
-  testKey: 104
 --- !u!135 &919132147682360162
 SphereCollider:
   m_ObjectHideFlags: 0

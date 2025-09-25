@@ -1,18 +1,16 @@
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
 // 7/23/2025 AI-Tag
 // This was created with the help of Assistant, a Unity Artificial Intelligence product.
 
-Shader "Custom/Body"
+Shader "Custom/Skybox"
 {
     Properties
     {
         _EnableFade("Enable Fade", int) = 1
-        //_FadeStart ("Fade Start", Float) = 1.0
-        _FadeThreshold ("Fade End", Range(0, 1)) = 0.8
+        _FadeStart ("Fade Start (World Y)", Float) = 1.0
+        _FadeEnd ("Fade End (World Y)", Float) = 0.0
         _Speed ("Fall Speed", Range(0, 1)) = 1.0
-        _StartColor ("Start Color", Color) = (0, 0, 0, 1)
-        _EndColor ("End Color", Color) = (1, 1, 1, 1)
+        _EndColor ("Start Color", Color) = (0, 0, 0, 1)
+        _StartColor ("End Color", Color) = (1, 1, 1, 1)
         _BellyColor ("Belly Color", Color) = (1, 1, 1, 1)
         _LCDScale ("LCD Scale", Float) = 100.0
         _LEDScale ("LED Scale", Float) = 5.0
@@ -40,8 +38,8 @@ Shader "Custom/Body"
 
             // Shader properties
             int _EnableFade;
-            //float _FadeStart;
-            float _FadeThreshold;
+            float _FadeStart;
+            float _FadeEnd;
             float4 _EndColor;
             float4 _StartColor;
             float4 _BellyColor;
@@ -51,6 +49,9 @@ Shader "Custom/Body"
             float _LEDScale;
             float _VoronoiScale;
             float _Transparency;
+            uniform float4 _FishPoint0;
+            uniform float4 _FishPoint1;
+            uniform float4 _FishPoint2;
 
             struct appdata
             {
@@ -63,7 +64,8 @@ Shader "Custom/Body"
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
                 float3 worldPos : TEXCOORD1;
-                float localY : TEXCOORD2;
+                float3 viewDir : TEXCOORD2;
+
             };
 
             // Vertex shader
@@ -71,9 +73,9 @@ Shader "Custom/Body"
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.localY = v.vertex.z; // local Y coordinate
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz; // Get world position
                 o.uv = v.uv; // Apply tiling to UVs
+                o.viewDir = normalize(_WorldSpaceCameraPos - o.worldPos);
                 return o;
             }
             
@@ -113,52 +115,50 @@ Shader "Custom/Body"
 
             half4 frag (v2f i) : SV_Target
             {
-                // Simulate a screen distortion normal (procedural or texture)
-                float2 bumpUV = i.uv * 5 + _Time.y * 0.5;
+                float3 viewDir = -normalize(i.viewDir);
+                float3 fishDir0 = normalize(_FishPoint0.xyz);
+                float3 fishDir1 = normalize(_FishPoint1.xyz);
+                float cosTheta0 = dot(fishDir0, viewDir);
+                float cosTheta1 = dot(fishDir1, viewDir);
+                cosTheta0 = pow(smoothstep(0.95, 1, cosTheta0), 5);
+                cosTheta1 = pow(smoothstep(0.95, 1, cosTheta1), 5);
+                float totalTheta = cosTheta0 - cosTheta1;
+                float2 fishForce = float2(totalTheta, totalTheta)*0.25;
 
+                // Simulate a screen distortion normal (procedural or texture)
+                i.uv -= fishForce;
+                float2 bumpUV = i.uv * 5 + _Time.y * 0.5;
                 // Procedural distortion (can replace with a normal map sample)
                 float2 normalOffset;
                 normalOffset.x = sin(bumpUV.y * 20.0 + sin(bumpUV.x * 10.0)) * 0.01;
                 normalOffset.y = cos(bumpUV.x * 20.0 + cos(bumpUV.y * 10.0)) * 0.01;
-
                 // Refraction strength scaling
                 normalOffset *= 0.05;
 
                 // Offset UV for refracted LED color
                 float2 refractedUV = i.uv + normalOffset;
-
                 float2 ledUV = refractedUV;
                 float2 voronoiUV = refractedUV;
                 voronoiUV.y += _Time.y * _Speed;
                 ledUV *= _LEDScale;
-
                 // Local UV inside the LED cell
                 float2 localUV = frac(ledUV * _LEDScale) - 0.5;
-
                 // LED radius
                 float dist = length(localUV);
+                //dist ripple
                 float ledMask = smoothstep(0.65, 0.25, dist); // Soft circular mask
 
                 // LED color from noise or voronoi
                 float glow; // Can be randomized
                 float voronoiValue = voronoi(voronoiUV * _VoronoiScale, glow);
-
                 float3 voronoiColor = lerp(_StartColor.rgb, _EndColor.rgb, glow);
                 float3 ledColor = voronoiColor * ledMask; // Apply circular mask
 
-                // Optional: glow halo around LED
                 float glowMask = smoothstep(0.4, 0.0, dist);
                 float3 glowColor = ledColor * glowMask * 0.2;
 
                 // Combine LED + Glow
                 float3 skinColor = ledColor + glowColor;
-
-                // Fade out top/bottom using world Y
-                float normalizedY = saturate(i.localY);
-
-                float fadeFactor = saturate((_FadeThreshold - normalizedY) / (1.0 - _FadeThreshold));
-                float alpha = _Transparency * fadeFactor;
-
                 // Chrome effect: RGB shifting bands
                 float2 chromeUV = refractedUV * _LCDScale * 0.5 + _Time.y * 0.25;
                 float shift = sin(chromeUV.x * 15.0 + chromeUV.y * 5.0);
@@ -175,15 +175,12 @@ Shader "Custom/Body"
 
                 // Blend into LED color
                 skinColor = lerp(skinColor, skinColor + chromeColor, 0.4) * _GlowIntensity;
-                float skinAlpha = saturate(pow(alpha + glow * alpha, 1));
-                float4 sc = float4(skinColor, skinAlpha);
-                float bellyFadeFactor = saturate(( normalizedY - _FadeThreshold+ voronoiValue) / (1.0 - _FadeThreshold)) * voronoiValue;
-                bellyFadeFactor = pow(bellyFadeFactor, 0.9);
-                float4 bc = _BellyColor * bellyFadeFactor;
 
-                float4 finalColor = _EnableFade ? lerp(bc, sc, skinAlpha) : float4(skinColor, 1);
+
+                float4 finalColor = float4(skinColor, 1);
+
+                //return float4(voronoiUV, 0, 1);
                 return finalColor;
-                //return float4(refractedUV, 0, 1);
             }
             ENDCG
         }

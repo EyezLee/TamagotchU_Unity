@@ -19,7 +19,6 @@ public enum EmoTag
     Anger,
     Neutral
 }
-
 public struct EmotionStatus
 {
     public string currEmoTag;
@@ -33,26 +32,15 @@ public struct EmotionStatus
         this.emotionDimension = overallEmo;
     }
 }
-
-public struct TransformData
-{
-    public Vector3 position;
-    public Vector3 forward;
-
-    public TransformData(Vector3 pos, Vector3 fwd)
-    {
-        position = pos;
-        forward = fwd;
-    }
-}
-
 public class TamaManager : MonoBehaviour
 {
     [Header("Config")]
     [SerializeField] public string tamapagerIP = "127.0.0.1";
     [SerializeField] public SocketReceiver socketReceiver;
     [SerializeField] public FrameRequester frameRequester;
+    [SerializeField] public int id;
     [SerializeField] GameObject bubble;
+    [SerializeField] VisualEffect thornVFX;
     [SerializeField] GameObject tamaBg;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
     [SerializeField] GameObject[] alarms;
@@ -66,26 +54,13 @@ public class TamaManager : MonoBehaviour
     [Header("Audio Source")]
     [SerializeField] List<AudioSource> sfxList = new List<AudioSource>();
 
-    [Header("Emotion Emulator")]
+/*    [Header("Emotion Emulator")]
     [SerializeField] bool debugMode = false;
     [SerializeField][Range(0, 1)] float hypeDebug;
     [SerializeField][Range(0, 1)] float posDebug;
     [SerializeField][Range(0, 1)] float negDebug;
     [SerializeField][Range(0, 1)] float alarmingDebug;
-    [SerializeField] KeyCode testKey;
-
-    /*    [Header("Spin Motion")]
-        // Axis around which the mesh spins
-        //public Vector3 spinAxis = Vector3.up;
-        // Rotation speed in degrees per second
-        public float spinSpeed = 90f;
-
-        [Header("Bounce Motion")]
-        public Vector3 sphereCenter = Vector3.zero;
-        public float sphereRadius = 5f;
-        public Vector3 velocity = new Vector3(1, 2, 1.5f);
-        public float damping = 0.98f; // slows it down a bit each bounce
-        public float accelerationStrength = 0f; // set >0 for gravity, e.g., 9.8f*/
+    [SerializeField] KeyCode testKey;*/
 
     float faceCamDist = float.MaxValue;
     private float swimForce = 5f;    // Swim-away force magnitude
@@ -93,12 +68,9 @@ public class TamaManager : MonoBehaviour
     float damping = 0.5f; // slows it down a bit each bounce
 
     private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
-    private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector4(0, 0, 0, 0));
+    private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector4(0, 0, 0, 1));
     Vector3 boundsMin;
     Vector3 boundsMax;
-
-    private float puffBlendTimer = 0f;
-    private bool isPuffBlend = false;
 
     private Coroutine mouthCoroutine;
     private Coroutine puffCoroutine;
@@ -107,16 +79,10 @@ public class TamaManager : MonoBehaviour
 
     private void Start()
     {
-        velocity = UnityEngine.Random.insideUnitSphere * 1f;
+        velocity = UnityEngine.Random.onUnitSphere * 1f;
 
         boundsMin = swimBounds.min + swimBounds.center;
         boundsMax = swimBounds.max + swimBounds.center;
-        // sound
-        /*        foreach(var a in sfxList)
-                {
-                    a.loop = true;
-                    a.Play();
-                }*/
     }
     private void Update()
     {
@@ -208,20 +174,39 @@ public class TamaManager : MonoBehaviour
         //Debug.Log(DebugEmo());
     }
 
-    private void FixToBound()
-    {
-        throw new NotImplementedException();
-    }
-
     private void ContiniousEmotionFeedback()
     {
-        // positive: shading
-        // negative: shading + bubble
-        // neutral: shading
+        float postiveVal = tamaEmo.emotionDimension.y;
+        float neutralVal = tamaEmo.emotionDimension.x;
+        float negativeVal = tamaEmo.emotionDimension.z;
+
+        // skybox interaction
+        string propertyName = "_FishPoint" + id.ToString();
+        var dir = (transform.position - cameraOrigin.position).normalized;
+        Shader.SetGlobalVector(propertyName, dir);
+
+        // color shading
+        tamaRenderer.materials.ElementAt(0).SetColor("_EndColor", tamaEmo.emotionDimension);
+
+        // positive: phantom
+        this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
+        foreach (var a in alarms)
+        {
+            a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 20);
+        }
+
+        // negative: thorn
+        string vfxPropertyName = "ThornScale";
+        thornVFX.SetFloat(vfxPropertyName, negativeVal*10);
+
+        // neutral: bubble
+        bubble.transform.localScale = new Vector3(neutralVal, neutralVal, neutralVal);
 
         // distance based behavior
+
+
         // swim closer to camera, more bubbles
-        if (!debugMode && faceCamDist <= 20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
+        if (faceCamDist <= 20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
     }
 
     private void InstantEmotionFeedback()
@@ -245,6 +230,7 @@ public class TamaManager : MonoBehaviour
         float currPuffKey = tamaRenderer.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(bodyShapekeyIndex);
         if (tamaEmo.currEmoTag == EmoTag.Anger.ToString() || tamaEmo.currEmoTag == EmoTag.Disgust.ToString())
         {
+            MoveAndRotateTowards(transform.position, transform.position - cameraOrigin.position);
             AnimateBlendShape(puffCoroutine, bodyShapekeyIndex, currPuffKey, 100, 1);
             PlayCurrSFX(2, 1, 1);
         }
@@ -296,21 +282,20 @@ public class TamaManager : MonoBehaviour
         socketReceiver.GetClientDataList(tamapagerIP, cachedMetaDataList);
 
         int count = cachedMetaDataList.Count;
-        tamaEmo.emotionDimension = Vector4.zero;
 
         for (int i = 0; i < count; i++)
         {
             string tag = cachedMetaDataList[i].tag;
             float val = cachedMetaDataList[i].value;
-            if (tag == EmoTag.Neutral.ToString()) tamaEmo.emotionDimension.x += val; // positive 
+            if (tag == EmoTag.Neutral.ToString()) tamaEmo.emotionDimension.x += val; // neutral 
             else if (tag == EmoTag.Happiness.ToString() || tag == EmoTag.Surprise.ToString()) tamaEmo.emotionDimension.y += val;
-            else tamaEmo.emotionDimension.z += val;
+            else tamaEmo.emotionDimension.z += val; // negative
         }
-
-        tamaEmo.emotionDimension /= count; // normalize
 
         if (count > 0)
         {
+            tamaEmo.emotionDimension /= count; // normalize
+
             var latestData = cachedMetaDataList.Last();
             faceCamDist = latestData.dist;
             tamaEmo.currEmoTag = latestData.tag;

@@ -98,14 +98,15 @@ Material:
     - _DstBlendAlpha: 0
     - _EnableFade: 1
     - _EnvironmentReflections: 1
-    - _FadeEnd: -0.01
-    - _FadeStart: 1.26
+    - _FadeEnd: 0.73
+    - _FadeStart: 0.21
+    - _FadeThreshold: 0.748
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GlowIntensity: 2.5
+    - _GlowIntensity: 2.2
     - _LCDScale: 100
-    - _LEDScale: 17.3
+    - _LEDScale: 16.19
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -117,22 +118,22 @@ Material:
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: 0.02
+    - _Speed: 0.051
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _Transparency: 1
     - _UVSec: 0
-    - _VoronoiScale: 45
+    - _VoronoiScale: 29.2
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
-    - _BellyColor: {r: 0.29932135, g: 0.0152287735, b: 0.44025147, a: 1}
+    - _BellyColor: {r: 0.27184656, g: 0.0085439505, b: 0.6037736, a: 1}
     - _Color: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
-    - _EndColor: {r: 0, g: 0, b: 0, a: 0}
+    - _EndColor: {r: 0.084905684, g: 0.084905684, b: 0.084905684, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _StartColor: {r: 1, g: 0.96470594, b: 0, a: 1}
   m_BuildTextureStacks: []

@@ -186,18 +186,19 @@ public class TamaManager : MonoBehaviour
         Shader.SetGlobalVector(propertyName, dir);
 
         // color shading
-        tamaRenderer.materials.ElementAt(0).SetColor("_EndColor", tamaEmo.emotionDimension);
+        tamaRenderer.materials.ElementAt(0).SetColor("_StartColor", tamaEmo.emotionDimension);
 
         // positive: phantom
         this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
         foreach (var a in alarms)
         {
-            a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 20);
+            a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
         }
 
         // negative: thorn
         string vfxPropertyName = "ThornScale";
-        thornVFX.SetFloat(vfxPropertyName, negativeVal*10);
+        thornVFX.SetFloat(vfxPropertyName, negativeVal*300);
+        tamaRenderer.materials.ElementAt(0).SetFloat("_FadeThreshold", 1-negativeVal);
 
         // neutral: bubble
         bubble.transform.localScale = new Vector3(neutralVal, neutralVal, neutralVal);

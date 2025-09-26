@@ -100,7 +100,8 @@ Material:
     - _EnvironmentReflections: 1
     - _FadeEnd: 0.81
     - _FadeStart: 1.26
-    - _FadeThreshold: 0.763
+    - _FadeThreshold: 0.893
+    - _Feather: 0.5
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1

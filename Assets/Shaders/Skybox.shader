@@ -118,16 +118,19 @@ Shader "Custom/Skybox"
                 float3 viewDir = -normalize(i.viewDir);
                 float3 fishDir0 = normalize(_FishPoint0.xyz);
                 float3 fishDir1 = normalize(_FishPoint1.xyz);
+                float3 fishDir2 = normalize(_FishPoint2.xyz);
                 float cosTheta0 = dot(fishDir0, viewDir);
                 float cosTheta1 = dot(fishDir1, viewDir);
-                cosTheta0 = pow(smoothstep(0.95, 1, cosTheta0), 5);
-                cosTheta1 = pow(smoothstep(0.95, 1, cosTheta1), 5);
-                float totalTheta = cosTheta0 - cosTheta1;
-                float2 fishForce = float2(totalTheta, totalTheta)*0.25;
+                float cosTheta2 = dot(fishDir2, viewDir);
+                cosTheta0 = pow(smoothstep(0.95, 1, cosTheta0), 2);
+                cosTheta1 = pow(smoothstep(0.95, 1, cosTheta1), 2);
+                cosTheta2 = pow(smoothstep(0.95, 1, cosTheta2), 2);
+                float totalTheta = cosTheta0 - cosTheta1 + cosTheta2;
+                float2 fishForce = float2(totalTheta, totalTheta)*0.35;
 
                 // Simulate a screen distortion normal (procedural or texture)
                 i.uv -= fishForce;
-                float2 bumpUV = i.uv * 5 + _Time.y * 0.5;
+                float2 bumpUV = i.uv * 2 + _Time.y * 1;
                 // Procedural distortion (can replace with a normal map sample)
                 float2 normalOffset;
                 normalOffset.x = sin(bumpUV.y * 20.0 + sin(bumpUV.x * 10.0)) * 0.01;
@@ -140,6 +143,8 @@ Shader "Custom/Skybox"
                 float2 ledUV = refractedUV;
                 float2 voronoiUV = refractedUV;
                 voronoiUV.y += _Time.y * _Speed;
+                //voronoiUV.y -= fishForce * _Time.x * 0.2;
+                //voronoiUV.x += fishForce * _Time.x * 0.1;
                 ledUV *= _LEDScale;
                 // Local UV inside the LED cell
                 float2 localUV = frac(ledUV * _LEDScale) - 0.5;

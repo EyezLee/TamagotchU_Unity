@@ -186,13 +186,15 @@ public class TamaManager : MonoBehaviour
         Shader.SetGlobalVector(propertyName, dir);
 
         // color shading
-        tamaRenderer.materials.ElementAt(0).SetColor("_StartColor", tamaEmo.emotionDimension);
+        Color bodyColor = new Color(1, 1 - negativeVal, postiveVal, 1);
+        tamaRenderer.materials.ElementAt(0).SetColor("_StartColor", bodyColor);
 
         // positive: phantom
         this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
         foreach (var a in alarms)
         {
             a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
+            a.GetComponent<Renderer>().material.SetColor("_ShadowColor", bodyColor);
         }
 
         // negative: thorn

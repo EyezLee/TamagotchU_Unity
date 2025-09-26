@@ -7,9 +7,8 @@ Shader "Custom/Body"
 {
     Properties
     {
-        _EnableFade("Enable Fade", int) = 1
-        //_FadeStart ("Fade Start", Float) = 1.0
         _FadeThreshold ("Fade End", Range(0, 1)) = 0.8
+        _Feather ("Feather Range", Range(0, 0.5)) = 0.5
         _Speed ("Fall Speed", Range(0, 1)) = 1.0
         _StartColor ("Start Color", Color) = (0, 0, 0, 1)
         _EndColor ("End Color", Color) = (1, 1, 1, 1)
@@ -39,9 +38,8 @@ Shader "Custom/Body"
             #include "UnityCG.cginc"
 
             // Shader properties
-            int _EnableFade;
-            //float _FadeStart;
             float _FadeThreshold;
+            float _Feather;
             float4 _EndColor;
             float4 _StartColor;
             float4 _BellyColor;
@@ -156,7 +154,11 @@ Shader "Custom/Body"
                 // Fade out top/bottom using world Y
                 float normalizedY = saturate(i.localY);
 
-                float fadeFactor = saturate((_FadeThreshold - normalizedY) / (1.0 - _FadeThreshold));
+                float edgeLow = _FadeThreshold - _Feather * 0.5;
+                float edgeHigh = _FadeThreshold + _Feather * 0.5;
+                float t = smoothstep(edgeLow, edgeHigh, normalizedY);
+
+                float fadeFactor = saturate((_FadeThreshold - normalizedY) / t);
                 float alpha = _Transparency * fadeFactor;
 
                 // Chrome effect: RGB shifting bands
@@ -177,11 +179,11 @@ Shader "Custom/Body"
                 skinColor = lerp(skinColor, skinColor + chromeColor, 0.4) * _GlowIntensity;
                 float skinAlpha = saturate(pow(alpha + glow * alpha, 1));
                 float4 sc = float4(skinColor, skinAlpha);
-                float bellyFadeFactor = saturate(( normalizedY - _FadeThreshold+ voronoiValue) / (1.0 - _FadeThreshold)) * voronoiValue;
+                float bellyFadeFactor = saturate(( normalizedY - _FadeThreshold+ voronoiValue) / t) * voronoiValue;
                 bellyFadeFactor = pow(bellyFadeFactor, 0.9);
                 float4 bc = _BellyColor * bellyFadeFactor;
 
-                float4 finalColor = _EnableFade ? lerp(bc, sc, skinAlpha) : float4(skinColor, 1);
+                float4 finalColor =lerp(bc, sc, skinAlpha);
                 return finalColor;
                 //return float4(refractedUV, 0, 1);
             }

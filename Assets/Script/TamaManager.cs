@@ -23,25 +23,26 @@ public struct EmotionStatus
 {
     public string currEmoTag;
     public float currEmoVal;
-    public Vector4 emotionDimension;
+    public Vector3 emotionDimension;
 
-    public EmotionStatus(string currEmoTag, float currEmoVal, Vector4 overallEmo)
+    public EmotionStatus(string currEmoTag, float currEmoVal, Vector3 overallEmo)
     {
         this.currEmoTag = currEmoTag;
         this.currEmoVal = currEmoVal;
         this.emotionDimension = overallEmo;
     }
 }
+
 public class TamaManager : MonoBehaviour
 {
     [Header("Config")]
+    [SerializeField] public int id;
+    [SerializeField] public Vector3 finisnality;// x: shy, y: bold, z: aggressive
     [SerializeField] public string tamapagerIP = "127.0.0.1";
     [SerializeField] public SocketReceiver socketReceiver;
     [SerializeField] public FrameRequester frameRequester;
-    [SerializeField] public int id;
     [SerializeField] GameObject bubble;
     [SerializeField] VisualEffect thornVFX;
-    [SerializeField] GameObject tamaBg;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
     [SerializeField] GameObject[] alarms;
 
@@ -68,7 +69,7 @@ public class TamaManager : MonoBehaviour
     float damping = 0.5f; // slows it down a bit each bounce
 
     private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
-    private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector4(0, 0, 0, 1));
+    private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector3(0, 0, 0));
     Vector3 boundsMin;
     Vector3 boundsMax;
 
@@ -83,6 +84,8 @@ public class TamaManager : MonoBehaviour
 
         boundsMin = swimBounds.min + swimBounds.center;
         boundsMax = swimBounds.max + swimBounds.center;
+
+        tamaEmo.emotionDimension = finisnality;
     }
     private void Update()
     {
@@ -90,88 +93,6 @@ public class TamaManager : MonoBehaviour
 
         InstantEmotionFeedback();
         ContiniousEmotionFeedback();
-        //FixToBound();
-
-        /*        float hypeVal = debugMode ? hypeDebug : tamaEmo.hyped;
-                float calmVal = 1 - hypeVal;
-                float posVal = debugMode ? posDebug : tamaEmo.lovey;
-                float alarmVal = debugMode ? alarmingDebug : tamaEmo.alarming;
-                float negVal = debugMode ? negDebug : tamaEmo.annoyned;
-
-                float bodyLow = 0, bodyHigh = 100, bodyLerp = negVal;
-                float mouthLow = 0, mouthHigh = 100, mouthLerp = (posVal + negVal) /2.0f;
-
-                // calm <-----> hype
-                TransformData bounceTrans = BounceMotion(transform);
-                TransformData SpinTrans = SpinMotion(transform, sphereCenter);
-                transform.position = Vector3.Lerp(bounceTrans.position, SpinTrans.position, hypeVal);
-                transform.forward = Vector3.Lerp(bounceTrans.forward, SpinTrans.forward, hypeVal);
-                if (bubble)
-                {
-                    float scale = Mathf.Lerp(0.15f, 1.0f, calmVal);
-                    bubble.transform.localScale = new Vector3(scale, scale, scale);
-                    bubble.transform.position = transform.position + new Vector3(0, 0, -0.5f * hypeVal);
-                }
-                if(GetComponent<AfterimageRenderer>() != null)
-                {
-                    GetComponent<AfterimageRenderer>().Duration = (int)Mathf.Lerp(1, 125, hypeVal);
-                }
-                calmAudio.volume = calmVal;
-                hypeAudio.volume = hypeVal * 0.85f;
-                hypeAudio.pitch = hypeVal * 1;
-
-                if (!debugMode && faceCamDist <=20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
-                //Debug.Log(faceCamDist);
-
-                // happy
-                if (posVal > 0.56)
-                {
-                    mouthHigh = 100 * posVal;
-                    mouthLow = 0;
-                }
-                posAudio.volume = Mathf.Pow(posVal, 4);
-                posAudio.pitch = Mathf.Pow(posVal * 2, 2);
-
-                if(Input.GetKeyDown(testKey))
-                {
-                    frameRequester.HumanBorn(transform.position, tamapagerIP);
-                }
-
-                // alarm
-                for (int i = 0; i < alarms.Length; i++)
-                {
-                    if (alarms[i])
-                    {
-                        // alarm material
-                        float alarmEmi = (Mathf.Sin(Mathf.Rad2Deg * Time.fixedTime) + 1) * 10 * alarmVal;
-                        alarms[i].GetComponent<MeshRenderer>().material.SetFloat("_Emission", Mathf.Lerp(1, alarmEmi, alarmVal));
-                    }
-                }
-                Material skyboxMat = RenderSettings.skybox;
-                if (skyboxMat)
-                {
-                    skyboxMat.SetFloat("_Speed", Mathf.Lerp(-0.1f, 0.45f, alarmVal));
-                    skyboxMat.SetFloat("_LCDScale", Mathf.Lerp(65.0f, 1.0f, alarmVal));
-                    skyboxMat.SetFloat("_LEDScale", Mathf.Lerp(5.0f, 95.0f, alarmVal));
-                    skyboxMat.SetFloat("_VoronoiScale", Mathf.Lerp(7.0f, 0.0f, alarmVal));
-                }
-                alarmAudio.volume = alarmVal;
-                alarmAudio.pitch = alarmVal * 2;
-
-                // neg: shapekeys, material
-                mouthLow = -50 * negVal;
-                bodyLow = 100 * negVal;
-                negAudio.volume = negVal;
-
-                // shapekeys
-                bodyLerp = negVal;
-                tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
-                tamaBg.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(bodyShapekeyIndex, Mathf.Lerp(bodyLow, bodyHigh, bodyLerp));
-                mouthLerp = GetAnimateValue(posVal + negVal);
-                tamaRenderer.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, Mathf.Lerp(mouthLow, mouthHigh, mouthLerp));
-                tamaBg.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(mouthShapekeyIndex, Mathf.Lerp(mouthLow, mouthHigh, posVal - negVal));
-        */
-        //Debug.Log(DebugEmo());
     }
 
     private void ContiniousEmotionFeedback()
@@ -186,27 +107,33 @@ public class TamaManager : MonoBehaviour
         Shader.SetGlobalVector(propertyName, dir);
 
         // color shading
-        Color bodyColor = new Color(1, 1 - negativeVal, postiveVal, 1);
+        Color bodyColor = new Color(neutralVal, 1 - negativeVal, postiveVal, 1);
         tamaRenderer.materials.ElementAt(0).SetColor("_StartColor", bodyColor);
+        Color earColor = new Color(Mathf.Clamp(postiveVal, 0.2f, 1), Mathf.Clamp(neutralVal, 0.2f, 1), Mathf.Clamp(negativeVal, 0.2f, 1), 1);
+        tamaRenderer.materials.ElementAt(3).SetColor("_ShadowColor", earColor);
+        tamaRenderer.materials.ElementAt(1).SetFloat("_HighlightThreshold", postiveVal);
 
         // positive: phantom
         this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
         foreach (var a in alarms)
         {
             a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
-            a.GetComponent<Renderer>().material.SetColor("_ShadowColor", bodyColor);
+            a.GetComponent<Renderer>().material.SetColor("_ShadowColor", earColor);
         }
 
         // negative: thorn
         string vfxPropertyName = "ThornScale";
-        thornVFX.SetFloat(vfxPropertyName, negativeVal*300);
+        thornVFX.SetFloat(vfxPropertyName, negativeVal*200);
         tamaRenderer.materials.ElementAt(0).SetFloat("_FadeThreshold", 1-negativeVal);
 
         // neutral: bubble
-        bubble.transform.localScale = new Vector3(neutralVal, neutralVal, neutralVal);
+        float normalizedNeutralVal = Mathf.Clamp01(neutralVal);
+        bubble.transform.localScale = new Vector3(normalizedNeutralVal, normalizedNeutralVal, normalizedNeutralVal);
+        bubble.transform.position = transform.position;
 
         // distance based behavior
-
+        float faceDistFactor = 1 - Mathf.Clamp01(faceCamDist / 50f); 
+        tamaEmo.emotionDimension += faceDistFactor * finisnality;
 
         // swim closer to camera, more bubbles
         if (faceCamDist <= 20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
@@ -304,7 +231,8 @@ public class TamaManager : MonoBehaviour
             tamaEmo.currEmoTag = latestData.tag;
             tamaEmo.currEmoVal = latestData.value;
         }
-        Debug.Log(DebugEmo());
+
+        //Debug.Log(DebugEmo());
     }
 
     private void NeutralSwim()
@@ -396,18 +324,33 @@ public class TamaManager : MonoBehaviour
         TamaManager otherFish = collision.gameObject.GetComponent<TamaManager>();
         if (otherFish != null)
         {
+            // change velocity
             Vector3 collisionDir = (transform.position - collision.transform.position).normalized;
             Vector3 randomDir = Quaternion.Euler(0, UnityEngine.Random.Range(-45f, 45f), 0) * collisionDir;
-
             velocity += (randomDir + UnityEngine.Random.insideUnitSphere * 0.3f).normalized * swimForce;
             otherFish.ReceiveSwimAwayForce(-randomDir);
-
             velocity *= damping;
+
+            // change tama emotion
+            tamaEmo.emotionDimension += finisnality * 0.5f;
+            if (finisnality.y > 0.5f)
+            {
+                tamaEmo.currEmoTag = EmoTag.Happiness.ToString();
+            }
+            if (finisnality.z > 0.5f)
+            {
+                tamaEmo.currEmoTag = EmoTag.Anger.ToString();
+            }
         }
 
         // tamaEmo change
 
         sfxList[5].Play();
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        tamaEmo.currEmoTag = EmoTag.Neutral.ToString();
     }
 
     public void ReceiveSwimAwayForce(Vector3 forceDirection)
@@ -491,7 +434,6 @@ public class TamaManager : MonoBehaviour
 
     public string DebugEmo()
     {
-        // return $"Calm: {tamaEmo.neutral}, Hyped: {tamaEmo.hyped}, Lovey: {tamaEmo.lovey}, Alarming: {tamaEmo.alarming}, Annoyned: {tamaEmo.annoyned}";
         return $"currEmoTag: {tamaEmo.currEmoTag}, value: {tamaEmo.currEmoVal}, dimension: {tamaEmo.emotionDimension}";
     }
 

@@ -79,6 +79,12 @@ public class TamaManager : MonoBehaviour
 
     private void Start()
     {
+        // activate all displays for projection
+        for(int i = 0; i < Display.displays.Length; i++) 
+        {
+            Display.displays[i].Activate();
+        }
+
         velocity = UnityEngine.Random.onUnitSphere;
 
         boundsMin = swimBounds.min;

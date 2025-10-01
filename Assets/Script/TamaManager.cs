@@ -108,12 +108,14 @@ public class TamaManager : MonoBehaviour
         // color shading
         Color bodyColor = new Color(neutralVal, 1 - negativeVal, postiveVal, 1);
         tamaRenderer.materials.ElementAt(0).SetColor("_StartColor", bodyColor);
+        //tamaRenderer.materials.ElementAt(0).SetFloat("_Transparent", 1);
         Color earColor = new Color(Mathf.Clamp(postiveVal, 0.2f, 1), Mathf.Clamp(neutralVal, 0.2f, 1), Mathf.Clamp(negativeVal, 0.2f, 1), 1);
         tamaRenderer.materials.ElementAt(3).SetColor("_ShadowColor", earColor);
         tamaRenderer.materials.ElementAt(1).SetFloat("_HighlightThreshold", postiveVal);
 
         // positive: phantom
         this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
+        this.GetComponent<AfterimageRenderer>().transparency = 1 - postiveVal * 0.625f;
         foreach (var a in alarms)
         {
             a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
@@ -122,7 +124,7 @@ public class TamaManager : MonoBehaviour
 
         // negative: thorn
         string vfxPropertyName = "ThornScale";
-        thornVFX.SetFloat(vfxPropertyName, negativeVal*200);
+        thornVFX.SetFloat(vfxPropertyName, negativeVal*100);
         tamaRenderer.materials.ElementAt(0).SetFloat("_FadeThreshold", 1-negativeVal);
 
         // neutral: bubble

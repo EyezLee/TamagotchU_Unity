@@ -25,6 +25,7 @@ namespace AfterimageSample
             if (_count >= _intervalFrames)
             {
                 _count = 0;
+
                 _afterimageRenderer.Enqueue();
             }
             _oldPosition = _afterimageRenderer.transform.position;

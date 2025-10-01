@@ -9,6 +9,7 @@ namespace AfterimageSample
         [SerializeField] public int _duration = 150;
         [SerializeField] int _layer = 6;
 
+        public float transparency;
         public int Duration { get { return _duration; } set {  _duration = value; } }
         SkinnedMeshRenderer[] _renderers;
         Stack<AfterImage> _pool = new Stack<AfterImage>();
@@ -33,12 +34,13 @@ namespace AfterimageSample
             for (int i = 0; i < _renderQueue.Count; i++)
             {
                 var afterimage = _renderQueue.Dequeue();
-                afterimage.RenderMeshes();
+                afterimage.RenderMeshes(i);
 
                 // 描画回数が限度を超えるまで繰り返しキューに入れる.
                 // 限度を超えたらプールに返す.
                 if (afterimage.FrameCount < _duration)
                 {
+                    afterimage.id++;
                     _renderQueue.Enqueue(afterimage);
                 }
                 else
@@ -70,7 +72,8 @@ namespace AfterimageSample
             {
                 afterimage = new AfterImage(meshCount);
             }
-            afterimage.Setup(_material, _layer, _renderers);
+
+            afterimage.Setup(_material, _layer, _renderers, transparency);
             _renderQueue.Enqueue(afterimage);
         }        
     }

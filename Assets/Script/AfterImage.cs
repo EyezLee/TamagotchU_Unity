@@ -9,6 +9,8 @@ namespace AfterimageSample
         Mesh[] _meshes;
         Matrix4x4[] _matrices;
 
+        public int id { get; set; }
+
         /// 描画された回数.
         public int FrameCount { get; private set; }
 
@@ -30,6 +32,7 @@ namespace AfterimageSample
         public void Reset()
         {
             FrameCount = 0;
+            id = 0;
         }
 
         // optimization
@@ -58,7 +61,7 @@ namespace AfterimageSample
         /// <param name="material">使用するマテリアル. </param>
         /// <param name="layer">描画するレイヤー.</param>
         /// <param name="renderers">記憶させるSkinnedMeshRendereの配列.</param>
-        public void Setup(Material material, int layer, SkinnedMeshRenderer[] renderers)
+        public void Setup(Material material, int layer, SkinnedMeshRenderer[] renderers, float t)
         {
             int count = 0;
             for (int i = 0; i < renderers.Length; i++)
@@ -67,17 +70,13 @@ namespace AfterimageSample
                 {
                     material = renderers[i].materials[j];
 
-                    if (material.shader.name == "Custom/Body")
-                    {
-                        material.SetFloat("_Transparency", 1 - i * 0.2f);
-                        Debug.Log(material.GetFloat("_Transparency"));
-
-                    }
-
                     if (_params[count].material != material)
                     {
                         _params[count] = new RenderParams(material);
                     }
+
+                    _params[i].material.SetFloat("_Transparent", t);
+
                     if (_params[count].layer != layer)
                     {
                         _params[count].layer = layer;
@@ -152,10 +151,11 @@ namespace AfterimageSample
         /// <summary>
         /// 記憶したメッシュを全て描画する.
         /// </summary>
-        public void RenderMeshes()
+        public void RenderMeshes(int id)
         {
             for (int i = 0; i < _meshes.Length; i++)
             {
+                //_params[i].material.SetFloat("_Transparent", id * 0.1f);
                 Graphics.RenderMesh(_params[i], _meshes[i], 0, _matrices[i]);
             }
             FrameCount++;

@@ -17,7 +17,7 @@ Shader "Custom/Body"
         _LEDScale ("LED Scale", Float) = 5.0
         _VoronoiScale ("Voronoi Scale", Float) = 5.0
         _GlowIntensity ("Glow Intensity", Float) = 2.0
-        _Transparency ("Transparency", Range(0, 1)) = 0.8
+        _Transparent ("Transparent", Range(0, 1)) = 0.8
     }
     SubShader
     {
@@ -48,7 +48,7 @@ Shader "Custom/Body"
             float _GlowIntensity;
             float _LEDScale;
             float _VoronoiScale;
-            float _Transparency;
+            float _Transparent;
 
             struct appdata
             {
@@ -159,7 +159,7 @@ Shader "Custom/Body"
                 float t = smoothstep(edgeLow, edgeHigh, normalizedY);
 
                 float fadeFactor = saturate((_FadeThreshold - normalizedY) / t);
-                float alpha = _Transparency * fadeFactor;
+                float alpha = _Transparent * fadeFactor;
 
                 // Chrome effect: RGB shifting bands
                 float2 chromeUV = refractedUV * _LCDScale * 0.5 + _Time.y * 0.25;

@@ -67,6 +67,13 @@ namespace AfterimageSample
                 {
                     material = renderers[i].materials[j];
 
+                    if (material.shader.name == "Custom/Body")
+                    {
+                        material.SetFloat("_Transparency", 1 - i * 0.2f);
+                        Debug.Log(material.GetFloat("_Transparency"));
+
+                    }
+
                     if (_params[count].material != material)
                     {
                         _params[count] = new RenderParams(material);

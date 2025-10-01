@@ -66,7 +66,6 @@ public class TamaManager : MonoBehaviour
     float faceCamDist = float.MaxValue;
     private float swimForce = 5f;    // Swim-away force magnitude
     Vector3 velocity;
-    float damping = 0.5f; // slows it down a bit each bounce
 
     private List<TimedEntry> cachedMetaDataList = new List<TimedEntry>();
     private EmotionStatus tamaEmo = new EmotionStatus(EmoTag.Neutral.ToString(), 0, new Vector3(0, 0, 0));
@@ -80,10 +79,10 @@ public class TamaManager : MonoBehaviour
 
     private void Start()
     {
-        velocity = UnityEngine.Random.onUnitSphere * 1f;
+        velocity = UnityEngine.Random.onUnitSphere;
 
-        boundsMin = swimBounds.min + swimBounds.center;
-        boundsMax = swimBounds.max + swimBounds.center;
+        boundsMin = swimBounds.min;
+        boundsMax = swimBounds.max;
 
         tamaEmo.emotionDimension = finisnality;
     }
@@ -237,7 +236,7 @@ public class TamaManager : MonoBehaviour
 
     private void NeutralSwim()
     {
-        Vector3 acceleration = (swimBounds.center - transform.position).normalized * 0.5f;
+        Vector3 acceleration = (swimBounds.center - transform.position).normalized * 0.05f;
         Vector3 pos = transform.position;
 
         // Apply acceleration to velocity
@@ -289,10 +288,10 @@ public class TamaManager : MonoBehaviour
         // Apply damping on bounce to simulate energy loss
         if (bounced)
         {
-            velocity *= damping;
+            velocity *= 0.9f; // damping
 
             // Add some random noise to velocity for more natural movement
-            velocity += UnityEngine.Random.insideUnitSphere * 1f;
+            velocity += UnityEngine.Random.insideUnitSphere * 0.5f;
         }
 
         transform.position = pos;
@@ -329,7 +328,6 @@ public class TamaManager : MonoBehaviour
             Vector3 randomDir = Quaternion.Euler(0, UnityEngine.Random.Range(-45f, 45f), 0) * collisionDir;
             velocity += (randomDir + UnityEngine.Random.insideUnitSphere * 0.3f).normalized * swimForce;
             otherFish.ReceiveSwimAwayForce(-randomDir);
-            velocity *= damping;
 
             // change tama emotion
             tamaEmo.emotionDimension += finisnality * 0.5f;
@@ -356,7 +354,7 @@ public class TamaManager : MonoBehaviour
     public void ReceiveSwimAwayForce(Vector3 forceDirection)
     {
         velocity += (forceDirection + UnityEngine.Random.insideUnitSphere * 0.3f).normalized * swimForce;
-        velocity *= damping;
+        velocity *= 0.9f;
     }
 
 

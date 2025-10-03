@@ -42,7 +42,7 @@ public class BlendShapeToVFXBinder : MonoBehaviour
         // Set the value to the VisualEffect property
         if (visualEffect.HasFloat(vfxPropertyName))
         {
-            visualEffect.SetFloat(vfxPropertyName, blendShapeValue);
+            visualEffect.SetFloat(vfxPropertyName, Mathf.Min(200, blendShapeValue));
         }
         else
         {
@@ -50,14 +50,14 @@ public class BlendShapeToVFXBinder : MonoBehaviour
         }
 
         // Check for the 'S' key press to start the coroutine
-        if (Input.GetKeyDown(KeyCode.P))
+/*        if (Input.GetKeyDown(KeyCode.P))
         {
             if (blendShapeCoroutine != null)
             {
                 StopCoroutine(blendShapeCoroutine);
             }
             blendShapeCoroutine = StartCoroutine(AnimateBlendShape(0, 100, debugShapekeyDuration));
-        }
+        }*/
     }
 
     private IEnumerator AnimateBlendShape(float startValue, float endValue, float duration)

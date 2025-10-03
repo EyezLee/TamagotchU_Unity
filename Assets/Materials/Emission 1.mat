@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Emission
+  m_Name: Emission 1
   m_Shader: {fileID: 4800000, guid: bfbd29dfe822e684485b6f1a727c2eaa, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -152,13 +152,13 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Base_Color: {r: 0.21698102, g: 0.21698102, b: 0.21698102, a: 0}
-    - _Color: {r: 0, g: 0.35566998, b: 1, a: 1}
+    - _Color: {r: 0.053194284, g: 1, b: 0, a: 1}
     - _Emission: {r: 0, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Emission_Color: {r: 1, g: 1, b: 1, a: 0}
     - _LitDirection: {r: 0.5, g: 0.5, b: 0, a: 0}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
-    - _ShadowColor: {r: 0, g: 0.203542, b: 1, a: 1}
+    - _ShadowColor: {r: 0, g: 1, b: 0.12644672, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
     - _Vector4: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

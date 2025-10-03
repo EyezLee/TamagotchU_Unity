@@ -9,7 +9,7 @@ public class FrameRequester : MonoBehaviour
     //public string pythonServerIp = "PYTHON_PC_IP"; // replace with real IP
     public int pythonPort = 6006;
     [SerializeField] Renderer debugRenderer;
-    [SerializeField] VisualEffect vfx;
+    //[SerializeField] VisualEffect vfx;
     [SerializeField] Vector4 faceAtlasConfig; // (numX, numY, resX, resY)
 
     int faceId = 0;
@@ -34,15 +34,10 @@ public class FrameRequester : MonoBehaviour
 
     void Update()
     {
-        /*        if (Input.GetKeyDown(KeyCode.F)) // Change 'F' to your desired key
-                {
-                    HumanBorn(Vector3.zero);
-                }*/
-
         cooldown += Time.deltaTime;
     }
 
-    public void HumanBorn(Vector3 pos, string ip)
+    public void HumanBorn(Vector3 pos, string ip, VisualEffect vfx)
     {
         if (cooldown > 1.5f)
         {
@@ -52,7 +47,7 @@ public class FrameRequester : MonoBehaviour
             {
                 int cellIndex = 0;
                 UpdateAtlas(receivedTexture, faceId, out cellIndex);
-                SendVFXEvent(cellIndex, pos);
+                SendVFXEvent(cellIndex, pos, vfx);
 
                 faceId++;
 
@@ -60,7 +55,7 @@ public class FrameRequester : MonoBehaviour
             }
             else
             {
-                SendVFXEvent(0, pos);
+                SendVFXEvent(0, pos, vfx);
                 Debug.Log("failed to receive facetexture");
             }
             cooldown = 0f;
@@ -191,7 +186,7 @@ public class FrameRequester : MonoBehaviour
     }
 
     // Sends VFX event to notify particle system of the new atlas cell to use and trigger spawning
-    void SendVFXEvent(int atlasCellIndex, Vector3 pos)
+    public void SendVFXEvent(int atlasCellIndex, Vector3 pos, VisualEffect vfx)
     {
         if (vfx != null)
         {

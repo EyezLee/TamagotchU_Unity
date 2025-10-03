@@ -25,7 +25,7 @@ public class DebugMenuManager : MonoBehaviour
     private void Update()
     {
         // Toggle debug UI with ESC
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Keypad0))
         {
             showDebugMenu = !showDebugMenu;
         }

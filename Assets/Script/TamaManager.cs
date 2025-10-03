@@ -43,6 +43,7 @@ public class TamaManager : MonoBehaviour
     [SerializeField] public FrameRequester frameRequester;
     [SerializeField] GameObject bubble;
     [SerializeField] VisualEffect thornVFX;
+    [SerializeField] VisualEffect humanVFX;
     [SerializeField] SkinnedMeshRenderer tamaRenderer;
     [SerializeField] GameObject[] alarms;
 
@@ -121,17 +122,17 @@ public class TamaManager : MonoBehaviour
 
         // positive: phantom
         this.GetComponent<AfterimageRenderer>().Duration = (int)(postiveVal * 100);
-        this.GetComponent<AfterimageRenderer>().transparency = 1 - postiveVal * 0.625f;
-        foreach (var a in alarms)
-        {
-            a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
-            a.GetComponent<Renderer>().material.SetColor("_ShadowColor", earColor);
-        }
+        this.GetComponent<AfterimageRenderer>().transparency = 1 - Mathf.Clamp01(postiveVal) * 0.625f;
+        //foreach (var a in alarms)
+        //{
+        //    a.GetComponent<Renderer>().material.SetFloat("_EmissionIntensity", postiveVal * 90);
+        //    a.GetComponent<Renderer>().material.SetColor("_ShadowColor", earColor);
+        //}
 
         // negative: thorn
         string vfxPropertyName = "ThornScale";
-        thornVFX.SetFloat(vfxPropertyName, negativeVal*100);
-        tamaRenderer.materials.ElementAt(0).SetFloat("_FadeThreshold", 1-negativeVal);
+        thornVFX.SetFloat(vfxPropertyName, Mathf.Min(negativeVal * 100, 200));
+        tamaRenderer.materials.ElementAt(0).SetFloat("_FadeThreshold", 1 - negativeVal);
 
         // neutral: bubble
         float normalizedNeutralVal = Mathf.Clamp01(neutralVal);
@@ -139,11 +140,16 @@ public class TamaManager : MonoBehaviour
         bubble.transform.position = transform.position;
 
         // distance based behavior
-        float faceDistFactor = 1 - Mathf.Clamp01(faceCamDist / 50f); 
+        float faceDistFactor = 1 - Mathf.Clamp01(faceCamDist / 50f);
         tamaEmo.emotionDimension += faceDistFactor * finisnality;
 
         // swim closer to camera, more bubbles
-        if (faceCamDist <= 20) frameRequester.HumanBorn(transform.position, tamapagerIP); // spawn human fish unless debug mode
+        if (faceCamDist <= 20) frameRequester.HumanBorn(transform.position, tamapagerIP, humanVFX); // spawn human fish unless debug mode
+
+/*        if (Input.GetKeyDown(KeyCode.F))
+        {
+            frameRequester.SendVFXEvent(0, transform.position, humanVFX);
+        }*/
     }
 
     private void InstantEmotionFeedback()
@@ -219,6 +225,9 @@ public class TamaManager : MonoBehaviour
         socketReceiver.GetClientDataList(tamapagerIP, cachedMetaDataList);
 
         int count = cachedMetaDataList.Count;
+
+        // reset emo tag
+        tamaEmo.currEmoTag = EmoTag.Neutral.ToString();
 
         for (int i = 0; i < count; i++)
         {
